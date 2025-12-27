@@ -1,0 +1,1186 @@
+/*AddNewRequest CSS - Base Styles*/
+.request-form-container {
+  padding: 40px;
+  height: auto;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  text-transform: UPPERCASE;
+}
+
+.add-new-btn {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 35px 0;
+  text-align: left;
+  padding: 0;
+  letter-spacing: 1.5px;
+  position: relative;
+  display: inline-block;
+  text-transform: UPPERCASE;
+  background: none;
+  border: none;
+  cursor: default;
+}
+
+.add-new-btn::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(90deg, #287bc9 0%, #5eaa4f 100%);
+  border-radius: 2px;
+}
+
+.form-section1 {
+  border: 1.5px solid #0055a2;
+  box-shadow: 0 10px 30px rgba(46, 99, 149, 0.5);
+  padding: 20px;
+  margin-bottom: 30px;
+  border-radius: 8px;
+}
+
+.form-section {
+  border: 1.5px solid #00a249;
+  box-shadow: 0 10px 30px rgba(46, 149, 84, 0.5);
+  padding: 20px;
+  margin-bottom: 30px;
+  border-radius: 8px;
+}
+
+.form-section-request {
+  margin-bottom: 30px;
+}
+
+.form-section-request1 {
+  margin-bottom: 0;
+}
+
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 30px;
+  margin-top: 10px;
+  align-items: flex-start;
+}
+
+.form-group,
+.form-group-textarea {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 200px;
+}
+
+.form-group label,
+.form-group-textarea label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  font-size: 13px;
+  padding: 8px 10px;
+  border-radius: 4px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 9px 8px;
+  border: 1px solid #aaa;
+  border-radius: 8px;
+  background-color: #fff;
+  text-transform: UPPERCASE;
+  font-size: 11px;
+  font-weight: bold;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-group select {
+  padding: 12px 8px;
+  color: #555;
+}
+
+.form-group-textarea1 {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 420px;
+  font-weight: bold;
+  margin-left: auto;
+  margin-right: 0;
+  margin-bottom: 20px;
+  font-size: 11px;
+  background-color: transparent;
+  border: none;
+}
+
+.form-group-textarea1 label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  font-size: 13px;
+  padding: 8px 10px;
+  border-radius: 4px;
+}
+
+.form-group-textarea1 textarea {
+  width: 100%;
+  padding: 9px 8px;
+  border: 1px solid #aaa;
+  background-color: #fff;
+  border-radius: 8px;
+  min-height: 80px;
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: UPPERCASE;
+  box-sizing: border-box;
+}
+
+.source-group label {
+  width: auto;
+}
+
+.source-group label small {
+  font-weight: bold;
+  font-size: 11px;
+  color: #666;
+}
+
+.select-with-button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.select-with-button select {
+  flex: 1;
+  border: 1px solid #aaa;
+  border-radius: 8px;
+}
+
+.plus-btn {
+  padding: 10px 12px;
+  font-size: 18px;
+  cursor: pointer;
+  background-color: gray;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.source-group .view-history {
+  font-size: 10px;
+  color: rgb(5, 107, 251);
+  text-decoration: underline;
+  margin-top: 10px;
+  display: inline-block;
+  font-weight: bold;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+  margin-top: 15px;
+  flex-wrap: wrap;
+}
+
+.attachment-btn {
+  text-transform: UPPERCASE;
+  background-color: #0055a2;
+  color: white;
+  padding: 10px 16px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.submit-btn {
+  text-transform: UPPERCASE;
+  background-color: #0d7b3e;
+  color: white;
+  padding: 10px 16px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.form-group.date input[type="date"] {
+  padding: 10.5px 5px;
+  width: 220px;
+  font-weight: bold;
+  font-size: 11px;
+  color: #666;
+}
+
+.form-group input[type="time"] {
+  padding: 10.5px 5px;
+  width: 175px;
+  font-weight: bold;
+  font-size: 11px;
+  color: #666;
+}
+
+/* Modal Styles */
+.category-modal-overlay,
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.category-modal-content {
+  position: relative;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
+  background: #fff;
+  padding: 20px;
+  width: 100%;
+  max-width: 500px;
+  border-radius: 8px;
+}
+
+.category-modal-content input {
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  border: 2px solid #ccc;
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: UPPERCASE;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+.category-modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  height: 40px;
+}
+
+.category-add-btn,
+.category-cancel-btn {
+  text-transform: UPPERCASE;
+  font-size: 12px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  color: white;
+  transition: 0.2s ease;
+  border-radius: 8px;
+  flex: 1;
+  min-width: 120px;
+}
+
+.category-add-btn {
+  background-color: #0055a2;
+}
+
+.category-cancel-btn {
+  background-color: #dc3545;
+}
+
+.category-cancel-btn:hover,
+.category-add-btn:hover {
+  background-color: #333;
+}
+
+.modal-content {
+  position: relative;
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  width: 100%;
+  max-width: 600px;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-content input {
+  width: 100%;
+  padding: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  text-transform: UPPERCASE;
+  box-sizing: border-box;
+}
+
+.modal-content table {
+  width: 100%;
+  margin: 10px 0;
+  border-collapse: collapse;
+  overflow-x: auto;
+  display: block;
+}
+
+.modal-content th,
+.modal-content td {
+  border: 2px solid #ccc;
+  padding: 6px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.add-btn {
+  padding: 8px 16px;
+  background-color: #dfb664;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: UPPERCASE;
+  border-radius: 8px;
+}
+
+.add-btn:hover {
+  background-color: #333;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.modal-close-btn {
+  background-color: #cb0f0f;
+  color: white;
+  border: none;
+  font-size: 24px;
+  padding: 2px 10px;
+  cursor: pointer;
+  border-radius: 8px;
+  line-height: 1;
+}
+
+.modal-close-btn:hover {
+  background-color: darkred;
+}
+
+.delete-btn {
+  color: black;
+  border: none;
+  padding: 3px 8px;
+  cursor: pointer;
+  font-size: 13px;
+  background: transparent;
+}
+
+.delete-btn:hover {
+  background-color: #c82333;
+  color: white;
+  border-radius: 4px;
+}
+
+/* Loader Styles */
+.fancy-loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+.loader-container {
+  position: relative;
+  width: 100px;
+  height: 100px;
+}
+
+.loader-box {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  transform: rotate(45deg);
+  animation: rotateBox 1.2s linear infinite;
+  opacity: 0.8;
+}
+
+.loader-box:nth-child(1) {
+  background-color: #0055a2;
+  top: -12px;
+  left: 30px;
+  animation-delay: 0s;
+}
+
+.loader-box:nth-child(2) {
+  background-color: #5eaa4f;
+  top: 30px;
+  left: -9px;
+  animation-delay: 0.3s;
+}
+
+.loader-box:nth-child(3) {
+  background-color: #9a53ba;
+  top: 30px;
+  left: 70px;
+  animation-delay: 0.6s;
+}
+
+.loader-box:nth-child(4) {
+  background-color: #f59e0b;
+  top: 70px;
+  left: 30px;
+  animation-delay: 0.9s;
+}
+
+@keyframes rotateBox {
+  0% {
+    transform: rotate(45deg) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: rotate(45deg) scale(1.3);
+    opacity: 0.6;
+  }
+  100% {
+    transform: rotate(45deg) scale(1);
+    opacity: 1;
+  }
+}
+
+/* ========== RESPONSIVE BREAKPOINTS ========== */
+
+/* Extra Large Desktop (1400px+) */
+@media (min-width: 1400px) {
+  .form-group-textarea1 {
+    max-width: 400px;
+    margin-top: -130px;
+  }
+}
+
+/* Large Desktop (1200px - 1399px) */
+@media (min-width: 1200px) and (max-width: 1399px) {
+  .request-form-container {
+    padding: 35px;
+  }
+
+  .form-row {
+    gap: 18px;
+  }
+
+  .form-group-textarea1 {
+    max-width: 400px;
+    margin-top: -150px;
+  }
+   /* .form-group.date label, */
+   .form-group.date input[type="date"]{
+    width: 50%;
+    /* margin-right: 200px; */
+    /* margin-left: 50px; */
+   }
+   .form-group.time label,
+  .form-group input[type="time"] {
+    width: 50%;
+    /* margin-right: 200px; */
+    margin-left: 50px;
+  }
+}
+
+/* Desktop (992px - 1199px) */
+@media (min-width: 992px) and (max-width: 1199px) {
+  .request-form-container {
+    padding: 30px;
+  }
+
+  .form-row {
+    gap: 16px;
+  }
+
+  .form-group,
+  .form-group-textarea {
+    min-width: 180px;
+  }
+
+  .form-group-textarea1 {
+    max-width: 400px;
+    margin-right: auto;
+  }
+  
+}
+
+/* Tablet (768px - 991px) */
+@media (min-width: 768px) and (max-width: 991px) {
+  .request-form-container {
+    padding: 25px;
+  }
+
+  .form-row {
+    gap: 15px;
+  }
+
+  .form-group,
+  .form-group-textarea {
+    flex: 1 1 calc(50% - 15px);
+    min-width: 0;
+  }
+
+  .form-group-textarea1 {
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .form-section1,
+  .form-section {
+    padding: 18px;
+  }
+
+  .form-group.date input[type="date"],
+  .form-group input[type="time"] {
+    width: 100%;
+  }
+}
+
+/* Small Tablet (600px - 767px) */
+@media (min-width: 600px) and (max-width: 767px) {
+  .request-form-container {
+    padding: 20px;
+  }
+
+  .add-new-btn {
+    font-size: 15px;
+    margin-bottom: 25px;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .form-group,
+  .form-group-textarea {
+    flex: 1 1 100%;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .form-group-textarea1 {
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .form-section1,
+  .form-section {
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+
+  .category-modal-content {
+    padding: 18px;
+  }
+
+  .modal-content {
+    padding: 18px;
+    max-width: 95%;
+  }
+
+  .modal-content th,
+  .modal-content td {
+    font-size: 10px;
+    padding: 5px;
+  }
+
+  .form-group.date input[type="date"],
+  .form-group input[type="time"] {
+    width: 100%;
+  }
+}
+
+/* Large Mobile (480px - 599px) */
+@media (min-width: 480px) and (max-width: 599px) {
+  .request-form-container {
+    padding: 18px;
+  }
+
+  .add-new-btn {
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .form-group,
+  .form-group-textarea {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .form-group-textarea1 {
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .form-group label,
+  .form-group-textarea label,
+  .form-group-textarea1 label {
+    font-size: 12px;
+    padding: 6px 8px;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea,
+  .form-group-textarea1 textarea {
+    font-size: 11px;
+    padding: 10px 8px;
+  }
+
+  .form-group select {
+    padding: 14px 8px;
+    min-height: 44px;
+  }
+
+  .form-section1,
+  .form-section {
+    padding: 14px;
+    margin-bottom: 18px;
+  }
+
+  .form-actions {
+    gap: 8px;
+  }
+
+  .attachment-btn,
+  .submit-btn {
+    padding: 12px 14px;
+    font-size: 11px;
+    flex: 1;
+    min-height: 44px;
+  }
+
+  .category-modal-content,
+  .modal-content {
+    padding: 16px;
+    max-width: 95%;
+  }
+
+  .category-modal-buttons {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .category-add-btn,
+  .category-cancel-btn {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .modal-content th,
+  .modal-content td {
+    font-size: 9px;
+    padding: 4px;
+  }
+
+  .plus-btn {
+    padding: 12px 12px;
+    font-size: 16px;
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .form-group small,
+  .form-group-textarea small {
+    font-size: 10px;
+    font-weight: normal;
+    text-transform: none;
+  }
+
+  .form-group.date input[type="date"],
+  .form-group input[type="time"] {
+    width: 100%;
+  }
+}
+
+/* Small Mobile (375px - 479px) */
+@media (min-width: 375px) and (max-width: 479px) {
+  .request-form-container {
+    padding: 15px;
+  }
+
+  .add-new-btn {
+    font-size: 13px;
+    margin-bottom: 18px;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .form-group,
+  .form-group-textarea,
+  .form-group-textarea1 {
+    min-width: 0;
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .form-group label,
+  .form-group-textarea label,
+  .form-group-textarea1 label {
+    font-size: 11px;
+    padding: 5px 7px;
+    font-weight: 600;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea,
+  .form-group-textarea1 textarea {
+    font-size: 11px;
+    padding: 10px 8px;
+    font-weight: 600;
+  }
+
+  .form-group select {
+    padding: 12px 8px;
+    min-height: 44px;
+  }
+
+  .form-section1,
+  .form-section {
+    padding: 12px;
+    margin-bottom: 16px;
+  }
+
+  .attachment-btn,
+  .submit-btn {
+    padding: 12px 12px;
+    font-size: 11px;
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .modal-content {
+    padding: 14px;
+    max-width: 95%;
+  }
+
+  .modal-content input {
+    padding: 10px;
+    font-size: 11px;
+  }
+
+  .modal-content th,
+  .modal-content td {
+    font-size: 9px;
+    padding: 3px;
+  }
+
+  .add-btn {
+    font-size: 11px;
+    padding: 10px 14px;
+    min-height: 44px;
+  }
+
+  .plus-btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .form-group small,
+  .form-group-textarea small {
+    font-size: 9px;
+    font-weight: normal;
+    text-transform: none;
+    line-height: 1.3;
+  }
+
+  .form-group.date input[type="date"],
+  .form-group input[type="time"] {
+    width: 100%;
+  }
+
+  .category-modal-buttons {
+    flex-direction: column;
+    height: auto;
+    gap: 10px;
+  }
+
+  .category-add-btn,
+  .category-cancel-btn {
+    width: 100%;
+  }
+}
+
+/* Extra Small Mobile (320px - 374px) */
+@media (min-width: 320px) and (max-width: 374px) {
+  .request-form-container {
+    padding: 12px;
+  }
+
+  .add-new-btn {
+    font-size: 12px;
+    margin-bottom: 16px;
+    letter-spacing: 1px;
+  }
+
+  .add-new-btn::after {
+    width: 50px;
+    height: 3px;
+    bottom: -8px;
+  }
+
+  .form-row {
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+
+  .form-group,
+  .form-group-textarea,
+  .form-group-textarea1 {
+    min-width: 0;
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .form-group label,
+  .form-group-textarea label,
+  .form-group-textarea1 label {
+    font-size: 10px;
+    padding: 4px 6px;
+    font-weight: 600;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea,
+  .form-group-textarea1 textarea {
+    font-size: 10px;
+    padding: 10px 6px;
+    font-weight: 600;
+  }
+
+  .form-group select {
+    padding: 12px 6px;
+    min-height: 44px;
+  }
+
+  .form-section1,
+  .form-section {
+    padding: 10px;
+    margin-bottom: 14px;
+  }
+
+  .form-section-request {
+    margin-bottom: 15px;
+  }
+
+  .attachment-btn,
+  .submit-btn {
+    padding: 12px 10px;
+    font-size: 10px;
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .plus-btn {
+    padding: 10px 10px;
+    font-size: 14px;
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .category-modal-content,
+  .modal-content {
+    padding: 12px;
+    max-width: 95%;
+  }
+
+  .category-modal-content input,
+  .modal-content input {
+    font-size: 10px;
+    padding: 8px;
+  }
+
+  .category-add-btn,
+  .category-cancel-btn {
+    font-size: 10px;
+    padding: 10px 12px;
+    min-height: 44px;
+  }
+
+  .modal-close-btn {
+    font-size: 20px;
+    padding: 4px 10px;
+  }
+
+  .modal-content table {
+    font-size: 8px;
+  }
+
+  .modal-content th,
+  .modal-content td {
+    font-size: 8px;
+    padding: 3px 2px;
+  }
+
+  .add-btn {
+    font-size: 10px;
+    padding: 10px 12px;
+    min-height: 44px;
+  }
+
+  .loader-container {
+    width: 70px;
+    height: 70px;
+  }
+
+  .loader-box {
+    width: 28px;
+    height: 28px;
+  }
+
+  .form-group small,
+  .form-group-textarea small {
+    font-size: 8px;
+    font-weight: normal;
+    text-transform: none;
+    line-height: 1.3;
+  }
+
+  .form-group.date input[type="date"],
+  .form-group input[type="time"] {
+    width: 100%;
+  }
+
+  .category-modal-buttons {
+    flex-direction: column;
+    height: auto;
+    gap: 10px;
+  }
+
+  .category-add-btn,
+  .category-cancel-btn {
+    width: 100%;
+  }
+}
+
+/* Very Small Mobile (below 320px) */
+@media (max-width: 319px) {
+  .request-form-container {
+    padding: 10px;
+  }
+
+  .add-new-btn {
+    font-size: 11px;
+    margin-bottom: 14px;
+  }
+
+  .form-row {
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .form-group,
+  .form-group-textarea,
+  .form-group-textarea1 {
+    min-width: 0;
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .form-group label,
+  .form-group-textarea label,
+  .form-group-textarea1 label {
+    font-size: 9px;
+    padding: 3px 5px;
+    font-weight: 600;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea,
+  .form-group-textarea1 textarea {
+    font-size: 9px;
+    padding: 10px 5px;
+    font-weight: 600;
+  }
+
+  .form-group select {
+    padding: 12px 5px;
+    min-height: 44px;
+  }
+
+  .form-section1,
+  .form-section {
+    padding: 8px;
+    margin-bottom: 12px;
+  }
+
+  .attachment-btn,
+  .submit-btn {
+    padding: 12px 8px;
+    font-size: 9px;
+    min-height: 44px;
+  }
+
+  .plus-btn {
+    padding: 10px 8px;
+    font-size: 12px;
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .category-modal-content,
+  .modal-content {
+    padding: 10px;
+    max-width: 95%;
+  }
+
+  .modal-content th,
+  .modal-content td {
+    font-size: 7px;
+    padding: 2px;
+  }
+
+  .loader-container {
+    width: 60px;
+    height: 60px;
+  }
+
+  .loader-box {
+    width: 24px;
+    height: 24px;
+  }
+
+  .form-group small,
+  .form-group-textarea small {
+    font-size: 8px;
+    font-weight: normal;
+    text-transform: none;
+    line-height: 1.2;
+  }
+
+  .form-group.date input[type="date"],
+  .form-group input[type="time"] {
+    width: 100%;
+  }
+
+  .category-modal-buttons {
+    flex-direction: column;
+    height: auto;
+    gap: 8px;
+  }
+
+  .category-add-btn,
+  .category-cancel-btn {
+    width: 100%;
+  }
+}
+
+/* Landscape Orientation Adjustments for Mobile */
+@media (max-width: 767px) and (orientation: landscape) {
+  .form-section1,
+  .form-section {
+    padding: 12px;
+  }
+
+  .modal-content {
+    max-height: 85vh;
+  }
+
+  .fancy-loader {
+    padding: 10px;
+  }
+}
+
+/* Additional fixes for very small screens */
+@media (max-width: 400px) {
+  .form-group select {
+    background-size: 16px;
+    background-position: right 6px center;
+    padding-right: 28px;
+  }
+
+  .select-with-button {
+    gap: 4px;
+  }
+
+  .modal-overlay {
+    padding: 10px;
+  }
+
+  .category-modal-content,
+  .modal-content {
+    border-radius: 6px;
+  }
+
+  .form-group-textarea1 {
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .form-group.date input[type="date"],
+  .form-group input[type="time"] {
+    width: 100%;
+  }
+}
+
+/* Medium screens - ensure date/time inputs don't break layout */
+@media (min-width: 768px) and (max-width: 1199px) {
+  .form-group.date input[type="date"] {
+    width: 100%;
+    max-width: 220px;
+  }
+
+  .form-group input[type="time"] {
+    width: 100%;
+    max-width: 175px;
+  }
+}

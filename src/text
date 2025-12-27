@@ -1,0 +1,491 @@
+/*Dashboard CSS - Modern Enhanced*/
+.dashboard-container {
+  padding: 40px;
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  text-transform: UPPERCASE;
+  height: auto;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+  min-height: 100vh;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 35px 0;
+  text-align: left;
+  padding: 0;
+  letter-spacing: 1.5px;
+  position: relative;
+  display: inline-block;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(90deg, #287bc9 0%, #5eaa4f 100%);
+  border-radius: 2px;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  gap: 30px;
+  max-width: 1400px;
+}
+
+.card-box {
+  display: flex;
+  flex-direction: column;
+  padding: 28px;
+  background: #ffffff;
+  border: none;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 16px;
+  min-height: 200px;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, #287bc9 0%, #5eaa4f 50%, #9a53ba 100%);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+.card-box:hover::before {
+  transform: scaleX(1);
+}
+
+.card-box:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 40px rgba(40, 123, 201, 0.15);
+}
+
+/* Card content wrapper */
+.card-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  flex: 1;
+  margin-bottom: 20px;
+}
+
+.card-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%);
+  border-radius: 16px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.card-box:hover .card-icon {
+  background: linear-gradient(135deg, #287bc9 0%, #5eaa4f 100%);
+  transform: scale(1.05);
+}
+
+.card-icon::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(135deg, #287bc9, #5eaa4f, #9a53ba);
+  border-radius: 16px;
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 0.3s ease;
+}
+
+.card-box:hover .card-icon::after {
+  opacity: 0.15;
+}
+
+.card-icon img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  transition: all 0.3s ease;
+  filter: brightness(0) saturate(100%) invert(31%) sepia(91%) saturate(1089%) hue-rotate(188deg) brightness(93%) contrast(90%);
+}
+
+.card-box:hover .card-icon img {
+  filter: brightness(0) invert(1);
+  transform: scale(1.1);
+}
+
+.card-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card-text h3 {
+  font-size: 15px;
+  color: #1a1a1a;
+  text-align: left;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin: 0;
+  line-height: 1.4;
+  transition: color 0.3s ease;
+}
+
+.card-box:hover .card-text h3 {
+  color: #287bc9;
+}
+
+.card-text p {
+  font-size: 11px;
+  color: #64748b;
+  margin: 0;
+  text-align: left;
+  letter-spacing: 0.3px;
+  line-height: 1.8;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  text-transform: none;
+  font-weight: 400;
+}
+
+.card-footer {
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.card-action {
+  color: #287bc9;
+  font-weight: 600;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+}
+
+.card-action svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2.5;
+  transition: transform 0.3s ease;
+}
+
+.card-box:hover .card-action {
+  color: #0052a5;
+  gap: 0.75rem;
+}
+
+.card-box:hover .card-action svg {
+  transform: translateX(4px);
+}
+
+/* Welcome section enhancement */
+.dashboard-welcome {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card-box {
+  animation: fadeInUp 0.6s ease-out backwards;
+}
+
+.card-box:nth-child(1) { animation-delay: 0.1s; }
+.card-box:nth-child(2) { animation-delay: 0.2s; }
+.card-box:nth-child(3) { animation-delay: 0.3s; }
+.card-box:nth-child(4) { animation-delay: 0.4s; }
+.card-box:nth-child(5) { animation-delay: 0.5s; }
+.card-box:nth-child(6) { animation-delay: 0.6s; }
+
+body {
+  overflow: auto;
+  background: #f5f7fa;
+}
+
+/* Responsive css for dashboard cards */
+/* ----------- Large Desktop (1200px - 1400px) ----------- */
+@media (min-width: 1200px) and (max-width: 1400px) {
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px;
+  }
+
+  .card-icon {
+    width: 75px;
+    height: 75px;
+  }
+
+  .card-icon img {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+/* ----------- Desktop (992px - 1199px) ----------- */
+@media (min-width: 992px) and (max-width: 1199px) {
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+
+  .dashboard-container {
+    padding: 30px;
+  }
+
+  .card-box {
+    padding: 24px;
+  }
+
+  .card-icon {
+    width: 70px;
+    height: 70px;
+  }
+
+  .card-icon img {
+    width: 45px;
+    height: 45px;
+  }
+
+  .card-text h3 {
+    font-size: 14px;
+  }
+
+  .card-text p {
+    font-size: 10px;
+  }
+}
+
+/* ----------- Tablet (768px - 991px) ----------- */
+@media (min-width: 768px) and (max-width: 991px) {
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .dashboard-container {
+    padding: 25px;
+  }
+
+  .card-box {
+    padding: 22px;
+    min-height: 180px;
+  }
+
+  .card-content {
+    gap: 18px;
+  }
+
+  .card-icon {
+    width: 65px;
+    height: 65px;
+  }
+
+  .card-icon img {
+    width: 42px;
+    height: 42px;
+  }
+
+  .card-text h3 {
+    font-size: 13px;
+  }
+
+  .card-text p {
+    font-size: 10px;
+  }
+
+  .card-action {
+    font-size: 0.8rem;
+  }
+}
+
+/* ----------- Small Tablet (600px - 767px) ----------- */
+@media (min-width: 600px) and (max-width: 767px) {
+  .card-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .card-box {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+
+  .card-icon {
+    width: 70px;
+    height: 70px;
+  }
+
+  .card-icon img {
+    width: 45px;
+    height: 45px;
+  }
+
+  .card-text h3 {
+    font-size: 14px;
+  }
+
+  .card-text p {
+    font-size: 10px;
+  }
+}
+
+/* ----------- Large Mobile (480px - 599px) ----------- */
+@media (min-width: 480px) and (max-width: 599px) {
+  .card-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .dashboard-container {
+    padding: 20px;
+  }
+
+  .card-box {
+    padding: 20px;
+    min-height: 170px;
+  }
+
+  .card-content {
+    gap: 16px;
+  }
+
+  .card-icon {
+    width: 65px;
+    height: 65px;
+  }
+
+  .card-icon img {
+    width: 42px;
+    height: 42px;
+  }
+
+  .card-text h3 {
+    font-size: 13px;
+  }
+
+  .card-text p {
+    font-size: 10px;
+  }
+
+  .card-action {
+    font-size: 0.8rem;
+  }
+}
+
+/* ----------- Small Mobile (320px - 479px) ----------- */
+@media (min-width: 320px) and (max-width: 479px) {
+  .card-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .dashboard-container {
+    padding: 16px;
+  }
+
+  .card-box {
+    padding: 18px;
+    min-height: 160px;
+  }
+
+  .card-content {
+    gap: 14px;
+  }
+
+  .card-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+  }
+
+  .card-icon img {
+    width: 38px;
+    height: 38px;
+  }
+
+  .card-text h3 {
+    font-size: 12px;
+  }
+
+  .card-text p {
+    font-size: 9px;
+    line-height: 1.6;
+  }
+
+  .card-action {
+    font-size: 0.75rem;
+  }
+
+  .card-action svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .section-title {
+    font-size: 14px;
+  }
+}
+
+/* ----------- Very Small Mobile (below 320px) ----------- */
+@media (max-width: 319px) {
+  .dashboard-container {
+    padding: 12px;
+  }
+
+  .card-box {
+    padding: 16px;
+  }
+
+  .card-icon {
+    width: 55px;
+    height: 55px;
+  }
+
+  .card-icon img {
+    width: 35px;
+    height: 35px;
+  }
+
+  .card-text h3 {
+    font-size: 11px;
+  }
+
+  .card-text p {
+    font-size: 9px;
+  }
+
+  .card-action {
+    font-size: 0.7rem;
+  }
+}
