@@ -300,7 +300,7 @@ const Summary = () => {
           display: "flex",
           gap: "8px",
           marginBottom: "25px",
-          background: "#f8f9fa",
+          background: "#dcdfe3",
           padding: "8px",
           borderRadius: "12px",
           boxShadow: "0 2px 4px rgba(0,0,0,0.08)",
