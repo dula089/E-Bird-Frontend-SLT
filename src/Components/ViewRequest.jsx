@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Eye } from "lucide-react";
+import { Eye, History } from "lucide-react";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
@@ -24,6 +24,7 @@ const ViewRequest = () => {
   const [selectedStatus, setSelectedStatus] = useState("All Statuses");
   const [selectedEmployee, setSelectedEmployee] = useState("All Employees");
   const [modalRequest, setModalRequest] = useState(null);
+  const [historyModal, setHistoryModal] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [currentUser, setCurrentUser] = useState(null);
   const [subordinateEmployees, setSubordinateEmployees] = useState([]);
@@ -31,7 +32,6 @@ const ViewRequest = () => {
   const itemsPerPage = 10;
   const { t } = useTranslation();
 
-  // ✅ Smart header creation function
   const createHeaders = async () => {
     const user = getCurrentUser();
     const headers = { "Content-Type": "application/json" };
@@ -47,14 +47,12 @@ const ViewRequest = () => {
     return headers;
   };
 
-  // ✅ ENHANCED: Recursively fetch ALL levels of subordinates
   const fetchAllSubordinates = async (
     employeeNumber,
     existingMap = {},
     fetchedEmployees = new Set()
   ) => {
     try {
-      // Prevent infinite loops
       if (fetchedEmployees.has(employeeNumber)) {
         return { allSubordinates: [], nameMap: existingMap };
       }
@@ -72,7 +70,6 @@ const ViewRequest = () => {
       let allSubordinates = [...subordinates];
       const updatedMap = { ...existingMap };
 
-      // ✅ FIXED: Handle both employeeNo and employeeNumber fields
       subordinates.forEach((emp) => {
         const empNumber = emp.employeeNumber || emp.employeeNo;
         if (empNumber) {
@@ -81,7 +78,6 @@ const ViewRequest = () => {
           } ${emp.employeeSurname || ""}`.trim();
           const displayName = fullName || emp.employeeName;
 
-          // Bidirectional mapping
           updatedMap[empNumber] = displayName;
           updatedMap[displayName] = empNumber;
           if (emp.employeeName && emp.employeeName !== displayName) {
@@ -90,7 +86,6 @@ const ViewRequest = () => {
         }
       });
 
-      // ✅ Recursively fetch nested subordinates
       for (const subordinate of subordinates) {
         const empNumber = subordinate.employeeNumber || subordinate.employeeNo;
         if (empNumber && !fetchedEmployees.has(empNumber)) {
@@ -126,17 +121,14 @@ const ViewRequest = () => {
     }
   };
 
-  // ✅ Fetch employee names for requests
   const fetchEmployeeNamesForRequests = async (requests, existingNameMap) => {
     try {
       const employeeNumbers = new Set();
 
-      // Collect ALL employee numbers from both assignTo and assignedBy
       requests.forEach((req) => {
         const assignTo = String(req.assignTo || "").trim();
         const assignedBy = String(req.assignedBy || "").trim();
 
-        // Extract employee number if it's a 6-digit number
         if (/^\d{6}$/.test(assignTo)) {
           employeeNumbers.add(assignTo);
         }
@@ -144,7 +136,6 @@ const ViewRequest = () => {
           employeeNumbers.add(assignedBy);
         }
 
-        // Also extract from patterns like "NAME (012345)"
         const assignToMatch = assignTo.match(/\((\d{6})\)/);
         const assignedByMatch = assignedBy.match(/\((\d{6})\)/);
         if (assignToMatch) employeeNumbers.add(assignToMatch[1]);
@@ -158,7 +149,6 @@ const ViewRequest = () => {
 
       const updatedNameMap = { ...existingNameMap };
 
-      // Fetch names for each employee number
       for (const empNum of employeeNumbers) {
         if (!updatedNameMap[empNum]) {
           try {
@@ -168,7 +158,6 @@ const ViewRequest = () => {
             console.log(`📦 Response for ${empNum}:`, response);
 
             if (response && Array.isArray(response) && response.length > 0) {
-              // Find the employee in the response
               const employee = response.find(
                 (emp) => (emp.employeeNumber || emp.employeeNo) === empNum
               );
@@ -183,7 +172,6 @@ const ViewRequest = () => {
                   `✅ Found name for ${empNum}: ${updatedNameMap[empNum]}`
                 );
               } else {
-                // If not found in response, try the first employee (might be the employee themselves)
                 const firstEmp = response[0];
                 const fullName = `${firstEmp.employeeTitle || ""} ${
                   firstEmp.employeeInitials || ""
@@ -219,7 +207,6 @@ const ViewRequest = () => {
   };
 
   useEffect(() => {
-    // Get current user
     const user = getCurrentUser();
     if (!user) {
       alert("Unable to identify current user. Please log in again.");
@@ -229,7 +216,6 @@ const ViewRequest = () => {
     console.log("Current user in ViewRequest:", user);
 
     const initializeData = async () => {
-      // Fetch all subordinates (including nested ones)
       const { allSubordinates, nameMap } = await fetchAllSubordinates(
         user.employeeNumber
       );
@@ -240,19 +226,16 @@ const ViewRequest = () => {
 
       setSubordinateEmployees(allSubordinates);
 
-      // Then fetch requests
       await fetchRequests(user, allSubordinates, nameMap);
     };
 
     if (user.profile === "erp_employee" && user.employeeNumber) {
       initializeData();
     } else {
-      // For non-ERP users, just fetch requests without subordinates
       fetchRequests(user, [], {});
     }
   }, []);
 
-  // ✅ FIXED: Enhanced filtering to include ALL subordinate requests
   const fetchRequests = async (
     user,
     subordinates = [],
@@ -267,11 +250,9 @@ const ViewRequest = () => {
       console.log("📥 All requests fetched:", data.length);
       console.log("📥 First 3 requests sample:", data.slice(0, 3));
 
-      // ✅ CRITICAL FIX: Build comprehensive identifier set
       const employeeIdentifiers = new Set();
-      const employeeNumbers = new Set(); // Separate set for just numbers
+      const employeeNumbers = new Set();
 
-      // Add current user identifiers
       if (user.profile === "erp_employee" && user.employeeNumber) {
         employeeIdentifiers.add(user.employeeNumber);
         employeeNumbers.add(user.employeeNumber);
@@ -288,7 +269,6 @@ const ViewRequest = () => {
         }
       }
 
-      // ✅ Add ALL subordinate identifiers
       subordinates.forEach((emp) => {
         const empNumber = emp.employeeNumber || emp.employeeNo;
         if (empNumber) {
@@ -313,20 +293,26 @@ const ViewRequest = () => {
       console.log("🔍 Employee numbers:", Array.from(employeeNumbers));
       console.log("🔍 All identifiers:", Array.from(employeeIdentifiers));
 
-      // ✅ MOST ROBUST FILTER: Check multiple ways
       const userRequests = data.filter((request) => {
         const assignedBy = String(request.assignedBy || "").trim();
         const assignTo = String(request.assignTo || "").trim();
+        const forwardedBy = String(request.forwardedBy || "").trim();
 
-        // Method 1: Check if assignedBy or assignTo exactly matches any employee number
-        if (employeeNumbers.has(assignedBy) || employeeNumbers.has(assignTo)) {
+        if (
+          employeeNumbers.has(assignedBy) ||
+          employeeNumbers.has(assignTo) ||
+          employeeNumbers.has(forwardedBy)
+        ) {
           console.log(`✅ MATCH (exact number): ${request.requestId}`);
           return true;
         }
 
-        // Method 2: Check if any employee number is contained in assignedBy or assignTo
         for (const empNum of employeeNumbers) {
-          if (assignedBy.includes(empNum) || assignTo.includes(empNum)) {
+          if (
+            assignedBy.includes(empNum) ||
+            assignTo.includes(empNum) ||
+            forwardedBy.includes(empNum)
+          ) {
             console.log(
               `✅ MATCH (contains number ${empNum}): ${request.requestId}`
             );
@@ -334,15 +320,16 @@ const ViewRequest = () => {
           }
         }
 
-        // Method 3: Check names (case-insensitive)
         const assignedByLower = assignedBy.toLowerCase();
         const assignToLower = assignTo.toLowerCase();
+        const forwardedByLower = forwardedBy.toLowerCase();
 
         for (const identifier of employeeIdentifiers) {
           if (typeof identifier === "string" && !/^\d{6}$/.test(identifier)) {
             if (
               assignedByLower.includes(identifier.toLowerCase()) ||
-              assignToLower.includes(identifier.toLowerCase())
+              assignToLower.includes(identifier.toLowerCase()) ||
+              forwardedByLower.includes(identifier.toLowerCase())
             ) {
               console.log(
                 `✅ MATCH (name ${identifier}): ${request.requestId}`
@@ -353,7 +340,7 @@ const ViewRequest = () => {
         }
 
         console.log(
-          `❌ No match: ${request.requestId} | assignedBy: "${assignedBy}" | assignTo: "${assignTo}"`
+          `❌ No match: ${request.requestId} | assignedBy: "${assignedBy}" | assignTo: "${assignTo}" | forwardedBy: "${forwardedBy}"`
         );
         return false;
       });
@@ -374,7 +361,6 @@ Employee numbers being checked: ${Array.from(employeeNumbers).join(", ")}
       setMyRequests(userRequests);
       await fetchEmployeeNamesForRequests(userRequests, initialNameMap);
 
-      // Show breakdown
       const assignedToCount = userRequests.filter((r) =>
         Array.from(employeeNumbers).some((num) =>
           String(r.assignTo || "").includes(num)
@@ -420,7 +406,10 @@ Employee numbers being checked: ${Array.from(employeeNumbers).join(", ")}
   const formatDisplayDate = (dateString) =>
     dateString ? new Date(dateString).toLocaleDateString("en-GB") : "";
 
-  const getAssignToDisplay = (assignTo) => {
+  const getAssignToDisplay = (assignTo, assignToName) => {
+    // If assignToName is provided (from forwarded requests), use it
+    if (assignToName) return assignToName;
+
     if (!assignTo) return "Not Assigned";
     const trimmed = assignTo.trim();
     if (/^\d{6}$/.test(trimmed)) {
@@ -469,7 +458,7 @@ Employee numbers being checked: ${Array.from(employeeNumbers).join(", ")}
         const matchesSearch =
           !searchTerm ||
           request.requestId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          getAssignToDisplay(request.assignTo)
+          getAssignToDisplay(request.assignTo, request.assignToName)
             .toLowerCase()
             .includes(searchTerm.toLowerCase()) ||
           getAssignedByDisplay(request.assignedBy)
@@ -510,6 +499,14 @@ Employee numbers being checked: ${Array.from(employeeNumbers).join(", ")}
   const openModal = (request) => setModalRequest({ ...request });
   const closeModal = () => setModalRequest(null);
 
+  const openHistoryModal = (request) => {
+    setHistoryModal({ ...request });
+  };
+
+  const closeHistoryModal = () => {
+    setHistoryModal(null);
+  };
+
   const handleChange = (e) =>
     setModalRequest({ ...modalRequest, [e.target.name]: e.target.value });
 
@@ -525,7 +522,6 @@ Employee numbers being checked: ${Array.from(employeeNumbers).join(", ")}
 
       if (!res.ok) throw new Error("Failed to save changes");
 
-      // ✅ Show success popup with SweetAlert2
       Swal.fire({
         icon: "success",
         title: `REQUEST UPDATED SUCCESSFULLY <br> ${modalRequest.requestId}`,
@@ -536,14 +532,12 @@ Employee numbers being checked: ${Array.from(employeeNumbers).join(", ")}
 
       closeModal();
 
-      // Refresh requests
       const { allSubordinates, nameMap } = await fetchAllSubordinates(
         currentUser.employeeNumber
       );
       await fetchRequests(currentUser, allSubordinates, nameMap);
     } catch (error) {
       console.error("Error saving request:", error);
-      // ✅ Show error popup
       Swal.fire({
         icon: "error",
         title: "Update Failed",
@@ -557,7 +551,6 @@ Employee numbers being checked: ${Array.from(employeeNumbers).join(", ")}
   const handleDelete = async () => {
     if (!modalRequest?.id) return alert("No request selected");
 
-    // ✅ Use SweetAlert2 for confirmation
     const result = await Swal.fire({
       title: "Are you sure?",
       text: "Do you want to delete this request?",
@@ -580,7 +573,6 @@ Employee numbers being checked: ${Array.from(employeeNumbers).join(", ")}
 
       if (!res.ok) throw new Error("Failed to delete request");
 
-      // ✅ Show success popup
       Swal.fire({
         icon: "success",
         title: "REQUEST DELETED SUCCESSFULLY",
@@ -591,14 +583,12 @@ Employee numbers being checked: ${Array.from(employeeNumbers).join(", ")}
 
       closeModal();
 
-      // Refresh requests
       const { allSubordinates, nameMap } = await fetchAllSubordinates(
         currentUser.employeeNumber
       );
       await fetchRequests(currentUser, allSubordinates, nameMap);
     } catch (error) {
       console.error("Error deleting request:", error);
-      // ✅ Show error popup
       Swal.fire({
         icon: "error",
         title: "Delete Failed",
@@ -617,7 +607,9 @@ Employee numbers being checked: ${Array.from(employeeNumbers).join(", ")}
             req.receivedDate
           )}, ${getAssignedByDisplay(req.assignedBy)}, ${
             req.mainCategory
-          }, ${getAssignToDisplay(req.assignTo)}, ${req.status}`
+          }, ${getAssignToDisplay(req.assignTo, req.assignToName)}, ${
+            req.status
+          }`
       )
       .join("\n");
     navigator.clipboard.writeText(text);
@@ -627,7 +619,7 @@ Employee numbers being checked: ${Array.from(employeeNumbers).join(", ")}
   const handleExportCSV = () => {
     const exportData = filteredRequestsAll.map((req) => ({
       ...req,
-      assignTo: getAssignToDisplay(req.assignTo),
+      assignTo: getAssignToDisplay(req.assignTo, req.assignToName),
       assignedBy: getAssignedByDisplay(req.assignedBy),
     }));
     const ws = XLSX.utils.json_to_sheet(exportData);
@@ -639,7 +631,7 @@ Employee numbers being checked: ${Array.from(employeeNumbers).join(", ")}
   const handleExportExcel = () => {
     const exportData = filteredRequestsAll.map((req) => ({
       ...req,
-      assignTo: getAssignToDisplay(req.assignTo),
+      assignTo: getAssignToDisplay(req.assignTo, req.assignToName),
       assignedBy: getAssignedByDisplay(req.assignedBy),
     }));
     const ws = XLSX.utils.json_to_sheet(exportData);
@@ -667,7 +659,7 @@ Employee numbers being checked: ${Array.from(employeeNumbers).join(", ")}
       formatDisplayDate(req.receivedDate),
       getAssignedByDisplay(req.assignedBy),
       req.mainCategory,
-      getAssignToDisplay(req.assignTo),
+      getAssignToDisplay(req.assignTo, req.assignToName),
       req.status,
     ]);
 
@@ -856,7 +848,9 @@ Employee numbers being checked: ${Array.from(employeeNumbers).join(", ")}
                       <td>{formatDisplayDate(req.receivedDate)}</td>
                       <td>{getAssignedByDisplay(req.assignedBy)}</td>
                       <td>{req.mainCategory}</td>
-                      <td>{getAssignToDisplay(req.assignTo)}</td>
+                      <td>
+                        {getAssignToDisplay(req.assignTo, req.assignToName)}
+                      </td>
                       <td>
                         <div className="status-cell">
                           <div className="status-bar-wrapper">
@@ -874,12 +868,36 @@ Employee numbers being checked: ${Array.from(employeeNumbers).join(", ")}
                         </div>
                       </td>
                       <td>
-                        <button
-                          className="view-btn"
-                          onClick={() => openModal(req)}
-                        >
-                          <Eye size={17} />
-                        </button>
+                        <div className="action-buttons">
+                          <button
+                            className="view-btn"
+                            onClick={() => openModal(req)}
+                            title="View"
+                          >
+                            <Eye size={17} />
+                          </button>
+                          {req.forwardingHistory &&
+                            req.forwardingHistory.length > 0 && (
+                              <button
+                                className="history-btn"
+                                onClick={() => openHistoryModal(req)}
+                                title="View Forward History"
+                                style={{
+                                  backgroundColor: "transparent",
+                                  color: "#9333ea",
+                                  border: "none",
+                                  cursor: "pointer",
+                                  padding: "4px",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  transition: "opacity 0.2s ease",
+                                }}
+                              >
+                                <History size={17} />
+                              </button>
+                            )}
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -987,7 +1005,10 @@ Employee numbers being checked: ${Array.from(employeeNumbers).join(", ")}
                     <input
                       type="text"
                       name="assignTo"
-                      value={getAssignToDisplay(modalRequest.assignTo || "")}
+                      value={getAssignToDisplay(
+                        modalRequest.assignTo || "",
+                        modalRequest.assignToName || ""
+                      )}
                       readOnly
                       style={{ backgroundColor: "#f5f5f5" }}
                     />
@@ -1095,6 +1116,219 @@ Employee numbers being checked: ${Array.from(employeeNumbers).join(", ")}
               <button onClick={handleSave}>Save Changes</button>
               <button className="delete-btn" onClick={handleDelete}>
                 Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {historyModal && (
+        <div className="modal-overlay">
+          <div
+            className="modal"
+            style={{ maxWidth: "800px", maxHeight: "90vh", overflowY: "auto" }}
+          >
+            <button className="close-button" onClick={closeHistoryModal}>
+              ×
+            </button>
+            <h3 className="modal-title">Forwarding History</h3>
+
+            <div style={{ padding: "20px" }}>
+              <div
+                style={{
+                  backgroundColor: "#f9fafb",
+                  padding: "15px",
+                  borderRadius: "8px",
+                  marginBottom: "20px",
+                  border: "1px solid #e5e7eb",
+                }}
+              >
+                <p style={{ margin: "5px 0", fontSize: "14px" }}>
+                  <strong>Reference:</strong> {historyModal.requestId}
+                </p>
+                <p style={{ margin: "5px 0", fontSize: "14px" }}>
+                  <strong>Category:</strong> {historyModal.mainCategory}
+                </p>
+                <p style={{ margin: "5px 0", fontSize: "14px" }}>
+                  <strong>Current Assignee:</strong>{" "}
+                  {getAssignToDisplay(
+                    historyModal.assignTo,
+                    historyModal.assignToName
+                  )}
+                </p>
+              </div>
+
+              <h4
+                style={{
+                  fontSize: "14px",
+                  fontWeight: "bold",
+                  marginBottom: "15px",
+                  color: "#374151",
+                }}
+              >
+                Forward History Timeline:
+              </h4>
+
+              {historyModal.forwardingHistory &&
+              historyModal.forwardingHistory.length > 0 ? (
+                <div style={{ position: "relative", paddingLeft: "30px" }}>
+                  <div
+                    style={{
+                      position: "absolute",
+                      left: "8px",
+                      top: "10px",
+                      bottom: "10px",
+                      width: "2px",
+                      backgroundColor: "#d1d5db",
+                    }}
+                  />
+
+                  {historyModal.forwardingHistory.map((history, index) => (
+                    <div
+                      key={index}
+                      style={{
+                        position: "relative",
+                        marginBottom: "20px",
+                        backgroundColor: "#ffffff",
+                        padding: "15px",
+                        borderRadius: "8px",
+                        border: "1px solid #e5e7eb",
+                        boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                      }}
+                    >
+                      <div
+                        style={{
+                          position: "absolute",
+                          left: "-22px",
+                          top: "20px",
+                          width: "12px",
+                          height: "12px",
+                          borderRadius: "50%",
+                          backgroundColor: "#9333ea",
+                          border: "2px solid white",
+                          boxShadow: "0 0 0 2px #e5e7eb",
+                        }}
+                      />
+
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "flex-start",
+                          marginBottom: "10px",
+                        }}
+                      >
+                        <div style={{ flex: 1 }}>
+                          <p
+                            style={{
+                              margin: "5px 0",
+                              fontSize: "13px",
+                              color: "#6b7280",
+                            }}
+                          >
+                            <strong style={{ color: "#374151" }}>
+                              Forwarded By:
+                            </strong>{" "}
+                            {history.forwardedBy}
+                          </p>
+                          <p
+                            style={{
+                              margin: "5px 0",
+                              fontSize: "13px",
+                              color: "#6b7280",
+                            }}
+                          >
+                            <strong style={{ color: "#374151" }}>From:</strong>{" "}
+                            {history.forwardedFrom}
+                          </p>
+                          <p
+                            style={{
+                              margin: "5px 0",
+                              fontSize: "13px",
+                              color: "#6b7280",
+                            }}
+                          >
+                            <strong style={{ color: "#374151" }}>To:</strong>{" "}
+                            {history.forwardedTo}
+                          </p>
+                        </div>
+                        <div style={{ textAlign: "right" }}>
+                          <p
+                            style={{
+                              margin: "0",
+                              fontSize: "11px",
+                              color: "#9ca3af",
+                            }}
+                          >
+                            {new Date(history.timestamp).toLocaleString(
+                              "en-GB",
+                              {
+                                day: "2-digit",
+                                month: "short",
+                                year: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              }
+                            )}
+                          </p>
+                        </div>
+                      </div>
+
+                      {history.remarks && history.remarks !== "No remarks" && (
+                        <div
+                          style={{
+                            marginTop: "10px",
+                            padding: "10px",
+                            backgroundColor: "#f9fafb",
+                            borderRadius: "4px",
+                            borderLeft: "3px solid #9333ea",
+                          }}
+                        >
+                          <p
+                            style={{
+                              margin: "0",
+                              fontSize: "12px",
+                              color: "#6b7280",
+                            }}
+                          >
+                            <strong style={{ color: "#374151" }}>
+                              Remarks:
+                            </strong>{" "}
+                            {history.remarks}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div
+                  style={{
+                    padding: "40px",
+                    textAlign: "center",
+                    backgroundColor: "#f9fafb",
+                    borderRadius: "8px",
+                    color: "#6b7280",
+                  }}
+                >
+                  <History
+                    size={48}
+                    style={{ opacity: 0.3, marginBottom: "10px" }}
+                  />
+                  <p style={{ margin: "0", fontSize: "14px" }}>
+                    No forwarding history available
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div className="modal-actions">
+              <button
+                className="cancel-btn"
+                onClick={closeHistoryModal}
+                style={{ width: "120px" }}
+              >
+                Close
               </button>
             </div>
           </div>
