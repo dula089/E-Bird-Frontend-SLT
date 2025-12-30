@@ -9,60 +9,170 @@ import {
   TrendingUp,
   Users,
   Calendar,
+  Send,
+  Inbox,
+  LayoutDashboard,
 } from "lucide-react";
 import "../Components/RequestCSS/Summary.css";
 import { getAccessToken } from "../utils/authUtils";
+import { getCurrentUser } from "../utils/userUtils";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const Summary = () => {
-  const [requests, setRequests] = useState([]);
+  const [myRequests, setMyRequests] = useState([]);
+  const [myAssignments, setMyAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([]);
+  const [userName, setUserName] = useState("");
+  const [activeTab, setActiveTab] = useState("overview"); // "overview", "requests", "assignments"
   const { t } = useTranslation();
 
   useEffect(() => {
     fetchData();
   }, []);
 
+  const createHeaders = async () => {
+    const user = getCurrentUser();
+    const headers = {
+      "Content-Type": "application/json",
+    };
+
+    if (user && user.profile !== "erp_employee") {
+      try {
+        const token = await getAccessToken();
+        if (token) {
+          headers.Authorization = `Bearer ${token}`;
+        }
+      } catch (error) {
+        console.error("Error getting token:", error);
+      }
+    }
+
+    return headers;
+  };
+
   const fetchData = async () => {
     try {
-      const token = await getAccessToken(); // Get token once
+      const user = getCurrentUser();
 
+      if (!user) {
+        console.error("❌ No user data found");
+        alert("Unable to identify current user. Please log in again.");
+        return;
+      }
+
+      console.log("👤 Current user:", user);
+      setUserName(user.name || user.employeeName || "User");
+
+      const headers = await createHeaders();
+
+      // Fetch ALL requests and categories
       const [requestsRes, categoriesRes] = await Promise.all([
         fetch(`${API_BASE_URL}/AddNewRequest`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
+          method: "GET",
+          headers: headers,
         }),
         fetch(`${API_BASE_URL}/Categories`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
+          method: "GET",
+          headers: headers,
         }),
       ]);
 
       if (requestsRes.ok) {
-        const requestsData = await requestsRes.json();
-        setRequests(requestsData);
+        const allData = await requestsRes.json();
+        console.log("📥 All requests fetched:", allData.length);
+
+        // Filter MY REQUESTS (created by me)
+        const userRequests = allData.filter((request) => {
+          const assignedBy = request.assignedBy || "";
+
+          if (user.profile === "erp_employee") {
+            const employeeMatch = assignedBy.includes(user.employeeNumber);
+            const nameMatch = assignedBy
+              .toLowerCase()
+              .includes(user.name.toLowerCase());
+            return employeeMatch || nameMatch;
+          }
+
+          const matchesEmail =
+            assignedBy.toLowerCase() === user.email?.toLowerCase();
+          const matchesUsername =
+            assignedBy.toLowerCase() === user.username?.toLowerCase();
+          const matchesName =
+            assignedBy.toLowerCase() === user.name?.toLowerCase();
+          const containsUsername = assignedBy
+            .toLowerCase()
+            .includes(user.username?.toLowerCase() || "");
+          const containsName = assignedBy
+            .toLowerCase()
+            .includes(user.name?.toLowerCase() || "");
+
+          return (
+            matchesEmail ||
+            matchesUsername ||
+            matchesName ||
+            containsUsername ||
+            containsName
+          );
+        });
+
+        // Filter MY ASSIGNMENTS (assigned to me)
+        const userAssignments = allData.filter((request) => {
+          if (!request.assignTo) return false;
+
+          const assignToLower = request.assignTo.toLowerCase();
+
+          if (user.profile === "erp_employee") {
+            const employeeMatch = assignToLower.includes(user.employeeNumber);
+            const nameMatch = assignToLower.includes(user.name.toLowerCase());
+            return employeeMatch || nameMatch;
+          }
+
+          const userEmailLower = user.email?.toLowerCase() || "";
+          const userNameLower = user.name?.toLowerCase() || "";
+          const userUsernameLower = user.username?.toLowerCase() || "";
+
+          return (
+            assignToLower === userEmailLower ||
+            assignToLower === userNameLower ||
+            assignToLower === userUsernameLower ||
+            assignToLower.includes(userEmailLower.split("@")[0]) ||
+            assignToLower.includes(userNameLower) ||
+            assignToLower.includes(userUsernameLower)
+          );
+        });
+
+        console.log(`✅ My Requests: ${userRequests.length}`);
+        console.log(`✅ My Assignments: ${userAssignments.length}`);
+
+        setMyRequests(userRequests);
+        setMyAssignments(userAssignments);
       } else {
-        console.error("Failed to fetch requests");
+        console.error("❌ Failed to fetch requests");
       }
 
       if (categoriesRes.ok) {
         const categoriesData = await categoriesRes.json();
         setCategories(categoriesData);
       } else {
-        console.error("Failed to fetch categories");
+        console.error("❌ Failed to fetch categories");
       }
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("💥 Error fetching data:", error);
     } finally {
       setTimeout(() => setLoading(false), 1000);
     }
   };
+
+  // Get the active dataset based on selected tab
+  const getActiveRequests = () => {
+    if (activeTab === "requests") return myRequests;
+    if (activeTab === "assignments") return myAssignments;
+    return [...myRequests, ...myAssignments]; // Combined for overview
+  };
+
+  const requests = getActiveRequests();
 
   // Calculate statistics
   const totalRequests = requests.length;
@@ -171,9 +281,269 @@ const Summary = () => {
 
   return (
     <div className="summary-container">
-      <button className="summary-btn" style={{ width: "130px" }}>
-        SUMMARY
-      </button>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "20px",
+        }}
+      >
+        <button className="summary-btn" style={{ width: "130px" }}>
+          SUMMARY
+        </button>
+        {/* {userName && (
+          <div style={{ fontSize: "14px", color: "#666", fontWeight: "500" }}>
+            <Users
+              size={16}
+              style={{
+                display: "inline",
+                marginRight: "8px",
+                verticalAlign: "middle",
+              }}
+            />
+            {userName}'s Dashboard
+          </div>
+        )} */}
+      </div>
+
+      {/* Tab Navigation */}
+      {/* <div
+        style={{
+          display: "flex",
+          gap: "10px",
+          marginBottom: "20px",
+          borderBottom: "2px solid #e5e7eb",
+        }}
+      >
+        <button
+          onClick={() => setActiveTab("overview")}
+          style={{
+            padding: "10px 20px",
+            border: "none",
+            background: activeTab === "overview" ? "#0078d7" : "transparent",
+            color: activeTab === "overview" ? "white" : "#666",
+            borderRadius: "8px 8px 0 0",
+            cursor: "pointer",
+            fontWeight: "500",
+            fontSize: "14px",
+            transition: "all 0.3s ease",
+          }}
+        >
+          <FileText
+            size={16}
+            style={{ verticalAlign: "middle", marginRight: "8px" }}
+          />
+          Overview
+        </button>
+        <button
+          onClick={() => setActiveTab("requests")}
+          style={{
+            padding: "10px 20px",
+            border: "none",
+            background: activeTab === "requests" ? "#0078d7" : "transparent",
+            color: activeTab === "requests" ? "white" : "#666",
+            borderRadius: "8px 8px 0 0",
+            cursor: "pointer",
+            fontWeight: "500",
+            fontSize: "14px",
+            transition: "all 0.3s ease",
+          }}
+        >
+          <Send
+            size={16}
+            style={{ verticalAlign: "middle", marginRight: "8px" }}
+          />
+          My Requests ({myRequests.length})
+        </button>
+        <button
+          onClick={() => setActiveTab("assignments")}
+          style={{
+            padding: "10px 20px",
+            border: "none",
+            background: activeTab === "assignments" ? "#0078d7" : "transparent",
+            color: activeTab === "assignments" ? "white" : "#666",
+            borderRadius: "8px 8px 0 0",
+            cursor: "pointer",
+            fontWeight: "500",
+            fontSize: "14px",
+            transition: "all 0.3s ease",
+          }}
+        >
+          <Inbox
+            size={16}
+            style={{ verticalAlign: "middle", marginRight: "8px" }}
+          />
+          My Assignments ({myAssignments.length})
+        </button>
+      </div> */}
+
+      {/* Tab Navigation */}
+      <div
+        style={{
+          display: "flex",
+          gap: "8px",
+          marginBottom: "25px",
+          background: "#f8f9fa",
+          padding: "8px",
+          borderRadius: "12px",
+          boxShadow: "0 2px 4px rgba(0,0,0,0.08)",
+        }}
+      >
+        <button
+          onClick={() => setActiveTab("overview")}
+          style={{
+            flex: 1,
+            padding: "12px 20px",
+            border: "none",
+            background:
+              activeTab === "overview"
+                ? "linear-gradient(135deg, #0078d7 0%, #005a9e 100%)"
+                : "transparent",
+            color: activeTab === "overview" ? "white" : "#666",
+            borderRadius: "8px",
+            cursor: "pointer",
+            fontWeight: activeTab === "overview" ? "600" : "500",
+            fontSize: "14px",
+            transition: "all 0.3s ease",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "8px",
+            boxShadow:
+              activeTab === "overview"
+                ? "0 4px 12px rgba(0, 120, 215, 0.3)"
+                : "none",
+            transform: activeTab === "overview" ? "translateY(-2px)" : "none",
+          }}
+          onMouseEnter={(e) => {
+            if (activeTab !== "overview") {
+              e.currentTarget.style.background = "#e9ecef";
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (activeTab !== "overview") {
+              e.currentTarget.style.background = "transparent";
+            }
+          }}
+        >
+          <LayoutDashboard size={18} />
+          <span>Overview</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab("requests")}
+          style={{
+            flex: 1,
+            padding: "12px 20px",
+            border: "none",
+            background:
+              activeTab === "requests"
+                ? "linear-gradient(135deg, #9b54bc 0%, #ce9ee4 100%)"
+                : "transparent",
+            color: activeTab === "requests" ? "white" : "#666",
+            borderRadius: "8px",
+            cursor: "pointer",
+            fontWeight: activeTab === "requests" ? "600" : "500",
+            fontSize: "14px",
+            transition: "all 0.3s ease",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "8px",
+            boxShadow:
+              activeTab === "requests"
+                ? "0 4px 12px rgba(102, 126, 234, 0.3)"
+                : "none",
+            transform: activeTab === "requests" ? "translateY(-2px)" : "none",
+          }}
+          onMouseEnter={(e) => {
+            if (activeTab !== "requests") {
+              e.currentTarget.style.background = "#e9ecef";
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (activeTab !== "requests") {
+              e.currentTarget.style.background = "transparent";
+            }
+          }}
+        >
+          <Send size={18} />
+          <span>My Requests</span>
+          <span
+            style={{
+              background:
+                activeTab === "requests" ? "rgba(255,255,255,0.3)" : "#e9ecef",
+              padding: "2px 8px",
+              borderRadius: "12px",
+              fontSize: "12px",
+              fontWeight: "600",
+              minWidth: "24px",
+              textAlign: "center",
+            }}
+          >
+            {myRequests.length}
+          </span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab("assignments")}
+          style={{
+            flex: 1,
+            padding: "12px 20px",
+            border: "none",
+            background:
+              activeTab === "assignments"
+                ? "linear-gradient(135deg, #4ae14f 0%, #b0e57a 100%)"
+                : "transparent",
+            color: activeTab === "assignments" ? "white" : "#666",
+            borderRadius: "8px",
+            cursor: "pointer",
+            fontWeight: activeTab === "assignments" ? "600" : "500",
+            fontSize: "14px",
+            transition: "all 0.3s ease",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "8px",
+            boxShadow:
+              activeTab === "assignments"
+                ? "0 4px 12px rgba(240, 147, 251, 0.3)"
+                : "none",
+            transform:
+              activeTab === "assignments" ? "translateY(-2px)" : "none",
+          }}
+          onMouseEnter={(e) => {
+            if (activeTab !== "assignments") {
+              e.currentTarget.style.background = "#e9ecef";
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (activeTab !== "assignments") {
+              e.currentTarget.style.background = "transparent";
+            }
+          }}
+        >
+          <Inbox size={18} />
+          <span>My Assignments</span>
+          <span
+            style={{
+              background:
+                activeTab === "assignments"
+                  ? "rgba(255,255,255,0.3)"
+                  : "#e9ecef",
+              padding: "2px 8px",
+              borderRadius: "12px",
+              fontSize: "12px",
+              fontWeight: "600",
+              minWidth: "24px",
+              textAlign: "center",
+            }}
+          >
+            {myAssignments.length}
+          </span>
+        </button>
+      </div>
 
       {/* Stats Cards */}
       <div className="stats-grid">
@@ -182,7 +552,14 @@ const Summary = () => {
             <FileText size={15} />
           </div>
           <div className="stat-content">
-            <h3>Total Requests</h3>
+            <h3>
+              Total{" "}
+              {activeTab === "requests"
+                ? "Requests"
+                : activeTab === "assignments"
+                ? "Assignments"
+                : "Items"}
+            </h3>
             <p className="stat-number">{totalRequests}</p>
           </div>
         </div>
@@ -238,11 +615,96 @@ const Summary = () => {
         </div>
       </div>
 
+      {/* Quick Stats for Overview Tab */}
+      {activeTab === "overview" && (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(2, 1fr)",
+            gap: "20px",
+            marginBottom: "20px",
+          }}
+        >
+          {/* <div
+            style={{
+              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              padding: "20px",
+              borderRadius: "12px",
+              color: "white",
+              boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginBottom: "10px",
+              }}
+            >
+              <Send size={24} style={{ marginRight: "12px" }} />
+              <h3 style={{ margin: 0, fontSize: "18px" }}>My Requests</h3>
+            </div>
+            <p
+              style={{
+                fontSize: "32px",
+                fontWeight: "bold",
+                margin: "10px 0 5px 0",
+              }}
+            >
+              {myRequests.length}
+            </p>
+            <p style={{ fontSize: "14px", opacity: 0.9, margin: 0 }}>
+              Requests created by you
+            </p>
+          </div> */}
+
+          {/* <div
+            style={{
+              background: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+              padding: "20px",
+              borderRadius: "12px",
+              color: "white",
+              boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginBottom: "10px",
+              }}
+            >
+              <Inbox size={24} style={{ marginRight: "12px" }} />
+              <h3 style={{ margin: 0, fontSize: "18px" }}>My Assignments</h3>
+            </div>
+            <p
+              style={{
+                fontSize: "32px",
+                fontWeight: "bold",
+                margin: "10px 0 5px 0",
+              }}
+            >
+              {myAssignments.length}
+            </p>
+            <p style={{ fontSize: "14px", opacity: 0.9, margin: 0 }}>
+              Tasks assigned to you
+            </p>
+          </div> */}
+        </div>
+      )}
+
       {/* Two Column Layout */}
       <div className="summary-content">
         <div className="summary-left">
           <div className="summary-card">
-            <h2>Requests by Month ({currentYear})</h2>
+            <h2>
+              {activeTab === "requests"
+                ? "My Requests"
+                : activeTab === "assignments"
+                ? "My Assignments"
+                : "All Items"}{" "}
+              by Month ({currentYear})
+            </h2>
             <div className="chart-container">
               {monthlyData.map((count, index) => {
                 const maxCount = Math.max(...monthlyData, 1);
@@ -250,11 +712,11 @@ const Summary = () => {
                 return (
                   <div key={index} className="chart-bar-wrapper">
                     <div className="chart-bar">
-                      {count > 0 && ( // Added condition here
+                      {count > 0 && (
                         <div
                           className="chart-bar-fill"
                           style={{ height: `${height}%` }}
-                          title={`${count} requests`}
+                          title={`${count} items`}
                         >
                           <span className="chart-bar-value">{count}</span>
                         </div>
@@ -398,7 +860,14 @@ const Summary = () => {
         <div className="summary-right">
           {/* Requests by Category */}
           <div className="summary-card">
-            <h2>Requests by Category</h2>
+            <h2>
+              {activeTab === "requests"
+                ? "Requests"
+                : activeTab === "assignments"
+                ? "Assignments"
+                : "Items"}{" "}
+              by Category
+            </h2>
             {requestsByCategory.length > 0 ? (
               <div className="category-list">
                 {requestsByCategory.map((item, index) => (
@@ -413,9 +882,16 @@ const Summary = () => {
             )}
           </div>
 
-          {/* Recent Requests */}
+          {/* Recent Items */}
           <div className="summary-card">
-            <h2>Recent Requests</h2>
+            <h2>
+              Recent{" "}
+              {activeTab === "requests"
+                ? "Requests"
+                : activeTab === "assignments"
+                ? "Assignments"
+                : "Items"}
+            </h2>
             {recentRequests.length > 0 ? (
               <div className="recent-list">
                 {recentRequests.map((req) => (
@@ -440,7 +916,7 @@ const Summary = () => {
                 ))}
               </div>
             ) : (
-              <p className="no-data">No recent requests</p>
+              <p className="no-data">No recent items</p>
             )}
           </div>
         </div>
