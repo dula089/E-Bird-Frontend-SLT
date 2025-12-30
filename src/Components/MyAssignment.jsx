@@ -156,7 +156,9 @@ const MyAssignment = () => {
     [startDate, endDate, selectedCategory, selectedStatus]
   );
 
-  const getAssignToDisplay = (assignTo) => {
+  const getAssignToDisplay = (assignTo, assignToName) => {
+    if (assignToName) return assignToName;
+
     if (!assignTo) return "Not Assigned";
 
     if (/^\d{6}$/.test(assignTo)) {
@@ -432,6 +434,7 @@ const MyAssignment = () => {
       const updatedAssignment = {
         ...forwardModal,
         assignTo: forwardTo,
+        assignToName: forwardToDisplay,
         forwardedBy: currentUser?.name || currentUser?.email || "System",
         remarks: forwardRemarks || forwardModal.remarks,
         forwardingHistory: forwardingHistory,
@@ -800,7 +803,7 @@ const MyAssignment = () => {
                       <td>{req.requestId}</td>
                       <td>{formatDisplayDate(req.receivedDate)}</td>
                       <td>
-                        {getAssignToDisplay(req.assignTo)}
+                        {getAssignToDisplay(req.assignTo, req.assignToName)}
                         {isForwardedByCurrentUser(req) && (
                           <span
                             style={{
@@ -1129,7 +1132,12 @@ const MyAssignment = () => {
                   <td>
                     <input
                       type="text"
-                      value={getAssignToDisplay(forwardModal.assignTo) || ""}
+                      value={
+                        getAssignToDisplay(
+                          forwardModal.assignTo,
+                          forwardModal.assignToName
+                        ) || ""
+                      }
                       readOnly
                       style={{ backgroundColor: "#f5f5f5" }}
                     />
@@ -1340,7 +1348,10 @@ const MyAssignment = () => {
                 </p>
                 <p style={{ margin: "5px 0", fontSize: "14px" }}>
                   <strong>Current Assignee:</strong>{" "}
-                  {getAssignToDisplay(historyModal.assignTo)}
+                  {getAssignToDisplay(
+                    historyModal.assignTo,
+                    historyModal.assignToName
+                  )}
                 </p>
               </div>
 
