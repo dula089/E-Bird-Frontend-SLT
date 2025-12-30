@@ -807,15 +807,17 @@ const MyAssignment = () => {
                         {isForwardedByCurrentUser(req) && (
                           <span
                             style={{
-                              display: "block",
+                              display: "inline-block",
                               marginTop: "4px",
                               padding: "2px 6px",
                               backgroundColor: "#fef3c7",
                               color: "#92400e",
-                              fontSize: "10px",
+                              fontSize: "9px",
                               fontWeight: "bold",
                               borderRadius: "4px",
                               border: "1px solid #fbbf24",
+                              width: "fit-content",
+                              marginLeft: "8px",
                             }}
                           >
                             FORWARDED
