@@ -292,91 +292,7 @@ const Summary = () => {
         <button className="summary-btn" style={{ width: "130px" }}>
           SUMMARY
         </button>
-        {/* {userName && (
-          <div style={{ fontSize: "14px", color: "#666", fontWeight: "500" }}>
-            <Users
-              size={16}
-              style={{
-                display: "inline",
-                marginRight: "8px",
-                verticalAlign: "middle",
-              }}
-            />
-            {userName}'s Dashboard
-          </div>
-        )} */}
       </div>
-
-      {/* Tab Navigation */}
-      {/* <div
-        style={{
-          display: "flex",
-          gap: "10px",
-          marginBottom: "20px",
-          borderBottom: "2px solid #e5e7eb",
-        }}
-      >
-        <button
-          onClick={() => setActiveTab("overview")}
-          style={{
-            padding: "10px 20px",
-            border: "none",
-            background: activeTab === "overview" ? "#0078d7" : "transparent",
-            color: activeTab === "overview" ? "white" : "#666",
-            borderRadius: "8px 8px 0 0",
-            cursor: "pointer",
-            fontWeight: "500",
-            fontSize: "14px",
-            transition: "all 0.3s ease",
-          }}
-        >
-          <FileText
-            size={16}
-            style={{ verticalAlign: "middle", marginRight: "8px" }}
-          />
-          Overview
-        </button>
-        <button
-          onClick={() => setActiveTab("requests")}
-          style={{
-            padding: "10px 20px",
-            border: "none",
-            background: activeTab === "requests" ? "#0078d7" : "transparent",
-            color: activeTab === "requests" ? "white" : "#666",
-            borderRadius: "8px 8px 0 0",
-            cursor: "pointer",
-            fontWeight: "500",
-            fontSize: "14px",
-            transition: "all 0.3s ease",
-          }}
-        >
-          <Send
-            size={16}
-            style={{ verticalAlign: "middle", marginRight: "8px" }}
-          />
-          My Requests ({myRequests.length})
-        </button>
-        <button
-          onClick={() => setActiveTab("assignments")}
-          style={{
-            padding: "10px 20px",
-            border: "none",
-            background: activeTab === "assignments" ? "#0078d7" : "transparent",
-            color: activeTab === "assignments" ? "white" : "#666",
-            borderRadius: "8px 8px 0 0",
-            cursor: "pointer",
-            fontWeight: "500",
-            fontSize: "14px",
-            transition: "all 0.3s ease",
-          }}
-        >
-          <Inbox
-            size={16}
-            style={{ verticalAlign: "middle", marginRight: "8px" }}
-          />
-          My Assignments ({myAssignments.length})
-        </button>
-      </div> */}
 
       {/* Tab Navigation */}
       <div
@@ -494,7 +410,7 @@ const Summary = () => {
             border: "none",
             background:
               activeTab === "assignments"
-                ? "linear-gradient(135deg, #4ae14f 0%, #b0e57a 100%)"
+                ? "linear-gradient(135deg, #5eaa4f 0%, #88dd77 100%)"
                 : "transparent",
             color: activeTab === "assignments" ? "white" : "#666",
             borderRadius: "8px",
@@ -624,73 +540,7 @@ const Summary = () => {
             gap: "20px",
             marginBottom: "20px",
           }}
-        >
-          {/* <div
-            style={{
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-              padding: "20px",
-              borderRadius: "12px",
-              color: "white",
-              boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                marginBottom: "10px",
-              }}
-            >
-              <Send size={24} style={{ marginRight: "12px" }} />
-              <h3 style={{ margin: 0, fontSize: "18px" }}>My Requests</h3>
-            </div>
-            <p
-              style={{
-                fontSize: "32px",
-                fontWeight: "bold",
-                margin: "10px 0 5px 0",
-              }}
-            >
-              {myRequests.length}
-            </p>
-            <p style={{ fontSize: "14px", opacity: 0.9, margin: 0 }}>
-              Requests created by you
-            </p>
-          </div> */}
-
-          {/* <div
-            style={{
-              background: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
-              padding: "20px",
-              borderRadius: "12px",
-              color: "white",
-              boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                marginBottom: "10px",
-              }}
-            >
-              <Inbox size={24} style={{ marginRight: "12px" }} />
-              <h3 style={{ margin: 0, fontSize: "18px" }}>My Assignments</h3>
-            </div>
-            <p
-              style={{
-                fontSize: "32px",
-                fontWeight: "bold",
-                margin: "10px 0 5px 0",
-              }}
-            >
-              {myAssignments.length}
-            </p>
-            <p style={{ fontSize: "14px", opacity: 0.9, margin: 0 }}>
-              Tasks assigned to you
-            </p>
-          </div> */}
-        </div>
+        ></div>
       )}
 
       {/* Two Column Layout */}
