@@ -751,7 +751,7 @@ Employee numbers being checked: ${Array.from(employeeNumbers).join(", ")}
                 );
               })}
             </select>
-            <button className="view-task-button">{t("view_tasks")}</button>
+            {/* <button className="view-task-button">{t("view_tasks")}</button> */}
           </div>
 
           <div className="export-search-section">
@@ -937,7 +937,7 @@ Employee numbers being checked: ${Array.from(employeeNumbers).join(", ")}
             <button className="close-button" onClick={closeModal}>
               ×
             </button>
-            <h3 className="modal-title">View / Edit Request</h3>
+            <h3 className="modal-title">View Request</h3>
 
             <table className="modal-table">
               <tbody>
@@ -964,7 +964,9 @@ Employee numbers being checked: ${Array.from(employeeNumbers).join(", ")}
                       type="date"
                       name="receivedDate"
                       value={modalRequest.receivedDate || ""}
-                      onChange={handleChange}
+                      // onChange={handleChange}
+                      readOnly
+                      style={{ backgroundColor: "#f5f5f5" }}
                     />
                   </td>
                 </tr>
@@ -993,7 +995,9 @@ Employee numbers being checked: ${Array.from(employeeNumbers).join(", ")}
                       type="text"
                       name="mainCategory"
                       value={modalRequest.mainCategory || ""}
-                      onChange={handleChange}
+                      // onChange={handleChange}
+                      readOnly
+                      style={{ backgroundColor: "#f5f5f5" }}
                     />
                   </td>
                 </tr>
@@ -1071,7 +1075,7 @@ Employee numbers being checked: ${Array.from(employeeNumbers).join(", ")}
                     <strong>Status</strong>
                   </td>
                   <td>
-                    <select
+                    {/* <select
                       name="status"
                       value={modalRequest.status || ""}
                       onChange={handleChange}
@@ -1090,7 +1094,7 @@ Employee numbers being checked: ${Array.from(employeeNumbers).join(", ")}
                       <option>Approved</option>
                       <option>Completed</option>
                       <option>Rejected</option>
-                    </select>
+                    </select> */}
                     <div className="modal-progress-wrapper">
                       <div
                         className="modal-progress-fill"
@@ -1112,12 +1116,12 @@ Employee numbers being checked: ${Array.from(employeeNumbers).join(", ")}
               </tbody>
             </table>
 
-            <div className="modal-actions">
+            {/* <div className="modal-actions">
               <button onClick={handleSave}>Save Changes</button>
               <button className="delete-btn" onClick={handleDelete}>
                 Delete
               </button>
-            </div>
+            </div> */}
           </div>
         </div>
       )}

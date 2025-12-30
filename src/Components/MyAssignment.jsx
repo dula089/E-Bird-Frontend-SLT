@@ -735,7 +735,7 @@ const MyAssignment = () => {
               <option>{t("completed")}</option>
               <option>{t("rejected")}</option>
             </select>
-            <button className="view-task-button">{t("view_tasks")}</button>
+            {/* <button className="view-task-button">{t("view_tasks")}</button> */}
           </div>
 
           <div className="status-legend">
@@ -948,7 +948,9 @@ const MyAssignment = () => {
                       type="date"
                       name="receivedDate"
                       value={modalRequest.receivedDate || ""}
-                      onChange={handleChange}
+                      // onChange={handleChange}
+                      readOnly
+                      style={{ backgroundColor: "#f5f5f5" }}
                     />
                   </td>
                 </tr>
@@ -1080,9 +1082,9 @@ const MyAssignment = () => {
 
             <div className="modal-actions">
               <button onClick={handleSave}>Save Changes</button>
-              <button className="delete-btn" onClick={handleDelete}>
+              {/* <button className="delete-btn" onClick={handleDelete}>
                 Delete
-              </button>
+              </button> */}
             </div>
           </div>
         </div>
