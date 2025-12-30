@@ -4,6 +4,7 @@ import "../Components/RequestCSS/MyRequest.css";
 import { useTranslation } from "react-i18next";
 import { getAccessToken } from "../utils/authUtils";
 import { getCurrentUser } from "../utils/userUtils";
+import Swal from "sweetalert2";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const BACKEND_URL = `${API_BASE_URL}/AddNewRequest`;
@@ -45,7 +46,6 @@ const MyRequest = () => {
     return headers;
   };
 
-  // ✅ NEW: Fetch employee names for all unique assignTo values
   const fetchEmployeeNamesForRequests = async (requests, existingNameMap) => {
     try {
       const employeeNumbers = new Set();
@@ -228,7 +228,6 @@ const MyRequest = () => {
           `✅ Showing ${userRequests.length} requests for user: ${user.name} (from ${allData.length} total)`
         );
 
-        // ✅ Fetch employee names for all assignTo values
         const initialNameMap = await fetchEmployeeNames();
         await fetchEmployeeNamesForRequests(userRequests, initialNameMap);
       } catch (error) {
@@ -337,9 +336,16 @@ const MyRequest = () => {
       });
 
       if (!res.ok) throw new Error("Failed to save changes");
-      alert("REQUEST UPDATED SUCCESSFULLY");
-      closeModal();
 
+      Swal.fire({
+        icon: "success",
+        title: `REQUEST UPDATED SUCCESSFULLY <br> ${modalRequest.requestId}`,
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+      });
+
+      closeModal();
       const refresh = await fetch(BACKEND_URL, {
         headers: await createHeaders(),
       });
@@ -364,11 +370,16 @@ const MyRequest = () => {
 
       setMyRequests(userRequests);
 
-      // ✅ Refresh employee names after save
       await fetchEmployeeNamesForRequests(userRequests, employeeMap);
     } catch (error) {
       console.error("Error saving request:", error);
-      alert(error.message);
+      Swal.fire({
+        icon: "error",
+        title: "Update Failed",
+        text: error.message || "Please try again",
+        confirmButtonText: "OK",
+        confirmButtonColor: "#d33",
+      });
     }
   };
 
@@ -411,8 +422,7 @@ const MyRequest = () => {
 
       setMyRequests(userRequests);
 
-      // ✅ Refresh employee names after delete
-      await fetchEmployeeNamesForRequests(userRequests, employeeMap);
+        await fetchEmployeeNamesForRequests(userRequests, employeeMap);
     } catch (error) {
       console.error("Error deleting request:", error);
       alert(error.message);
@@ -488,7 +498,7 @@ const MyRequest = () => {
               <option>{t("completed")}</option>
               <option>{t("rejected")}</option>
             </select>
-            <button className="view-task-button">{t("View_Tasks")}</button>
+            {/* <button className="view-task-button">{t("View_Tasks")}</button> */}
           </div>
 
           <div className="status-legend">
@@ -650,7 +660,9 @@ const MyRequest = () => {
                       type="text"
                       name="assignedBy"
                       value={modalRequest.assignedBy || ""}
-                      onChange={handleChange}
+                      // onChange={handleChange}
+                      readOnly
+                      style={{ backgroundColor: "#f5f5f5" }}
                     />
                   </td>
                 </tr>
@@ -754,9 +766,9 @@ const MyRequest = () => {
             </table>
             <div className="modal-actions">
               <button onClick={handleSave}>Save Changes</button>
-              <button className="delete-btn" onClick={handleDelete}>
+              {/* <button className="delete-btn" onClick={handleDelete}>
                 Delete
-              </button>
+              </button> */}
             </div>
           </div>
         </div>
