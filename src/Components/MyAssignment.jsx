@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Eye, Forward, History } from "lucide-react";
+import { Eye, Forward, History, Paperclip, Download } from "lucide-react";
 import "../Components/RequestCSS/MyRequest.css";
 import { useTranslation } from "react-i18next";
 import { getAccessToken } from "../utils/authUtils";
@@ -63,6 +63,109 @@ const MyAssignment = () => {
     }
 
     return headers;
+  };
+
+  const handleDownloadAttachment = async (attachment) => {
+    console.log("📥 Attempting download:", attachment);
+
+    if (!attachment) {
+      Swal.fire({
+        icon: "error",
+        title: "Download Failed",
+        text: "Attachment data not available",
+        confirmButtonColor: "#d33",
+      });
+      return;
+    }
+
+    Swal.fire({
+      title: "Downloading...",
+      text: "Please wait",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
+    try {
+      if (attachment.cout && attachment.cout.trim()) {
+        console.log("✅ Base64 data found, length:", attachment.cout.length);
+
+        const base64Data = attachment.cout.replace(/\s/g, "");
+
+        const byteCharacters = atob(base64Data);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+
+        const fileName =
+          attachment.attachName || attachment.title || "attachment";
+        let mimeType = "application/octet-stream";
+
+        if (fileName.toLowerCase().endsWith(".pdf")) {
+          mimeType = "application/pdf";
+        } else if (fileName.toLowerCase().match(/\.(jpg|jpeg)$/)) {
+          mimeType = "image/jpeg";
+        } else if (fileName.toLowerCase().endsWith(".png")) {
+          mimeType = "image/png";
+        } else if (fileName.toLowerCase().match(/\.(doc|docx)$/)) {
+          mimeType = "application/msword";
+        } else if (fileName.toLowerCase().match(/\.(xls|xlsx)$/)) {
+          mimeType = "application/vnd.ms-excel";
+        }
+
+        const blob = new Blob([byteArray], { type: mimeType });
+
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+
+        Swal.close();
+
+        Swal.fire({
+          icon: "success",
+          title: "Download Complete",
+          text: `${fileName} has been downloaded`,
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      } else {
+        console.log("⚠️ No base64 data available");
+
+        Swal.fire({
+          icon: "warning",
+          title: "Attachment Not Available",
+          html: `
+          <div style="text-align: left; padding: 10px;">
+            <p><strong>File Name:</strong> ${attachment.attachName || "N/A"}</p>
+            <p><strong>Title:</strong> ${attachment.title || "N/A"}</p>
+            <p><strong>Size:</strong> ${attachment.size || "N/A"}</p>
+          </div>
+          <div style="margin-top: 15px; padding: 10px; background-color: #fef3c7; border-radius: 6px; font-size: 13px;">
+            <strong>Note:</strong> The file content is not available for download. The file may need to be re-uploaded.
+          </div>
+        `,
+          confirmButtonColor: "#3b82f6",
+          confirmButtonText: "OK",
+        });
+      }
+    } catch (error) {
+      console.error("❌ Error downloading attachment:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Download Failed",
+        text:
+          error.message || "Failed to download attachment. Please try again.",
+        confirmButtonColor: "#d33",
+      });
+    }
   };
 
   useEffect(() => {
@@ -247,7 +350,13 @@ const MyAssignment = () => {
     return filteredAssignmentsAll.slice(startIndex, startIndex + itemsPerPage);
   }, [filteredAssignmentsAll, currentPage]);
 
-  const openModal = (assignment) => setModalRequest({ ...assignment });
+  const openModal = (assignment) => {
+    console.log("📋 Opening modal for assignment:", assignment);
+    console.log("📎 Attachments data:", assignment.attachments);
+    console.log("📎 Attachments type:", typeof assignment.attachments);
+    console.log("📎 Attachments length:", assignment.attachments?.length);
+    setModalRequest({ ...assignment });
+  };
   const closeModal = () => setModalRequest(null);
 
   const openHistoryModal = (assignment) => {
@@ -735,7 +844,6 @@ const MyAssignment = () => {
               <option>{t("completed")}</option>
               <option>{t("rejected")}</option>
             </select>
-            {/* <button className="view-task-button">{t("view_tasks")}</button> */}
           </div>
 
           <div className="status-legend">
@@ -800,7 +908,19 @@ const MyAssignment = () => {
                 <tbody>
                   {paginatedAssignments.map((req) => (
                     <tr key={req.id}>
-                      <td>{req.requestId}</td>
+                      <td>
+                        {req.requestId}
+                        {req.attachments && req.attachments.length > 0 && (
+                          <Paperclip
+                            size={14}
+                            style={{
+                              marginLeft: "6px",
+                              color: "#6b7280",
+                              verticalAlign: "middle",
+                            }}
+                          />
+                        )}
+                      </td>
                       <td>{formatDisplayDate(req.receivedDate)}</td>
                       <td>
                         {getAssignToDisplay(req.assignTo, req.assignToName)}
@@ -948,7 +1068,6 @@ const MyAssignment = () => {
                       type="date"
                       name="receivedDate"
                       value={modalRequest.receivedDate || ""}
-                      // onChange={handleChange}
                       readOnly
                       style={{ backgroundColor: "#f5f5f5" }}
                     />
@@ -1034,6 +1153,111 @@ const MyAssignment = () => {
                     />
                   </td>
                 </tr>
+
+                {modalRequest.attachments &&
+                  modalRequest.attachments.length > 0 && (
+                    <tr>
+                      <td>
+                        <strong>Attachments</strong>
+                      </td>
+                      <td>
+                        <div
+                          style={{
+                            backgroundColor: "#f9fafb",
+                            padding: "12px",
+                            borderRadius: "6px",
+                            border: "1px solid #e5e7eb",
+                          }}
+                        >
+                          {modalRequest.attachments.map((attachment, index) => (
+                            <div
+                              key={index}
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                                padding: "10px",
+                                marginBottom:
+                                  index < modalRequest.attachments.length - 1
+                                    ? "8px"
+                                    : "0",
+                                backgroundColor: "#ffffff",
+                                borderRadius: "4px",
+                                border: "1px solid #e5e7eb",
+                              }}
+                            >
+                              <div
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "10px",
+                                  flex: 1,
+                                }}
+                              >
+                                <Paperclip
+                                  size={16}
+                                  style={{ color: "#6b7280" }}
+                                />
+                                <div style={{ flex: 1 }}>
+                                  <div
+                                    style={{
+                                      fontSize: "14px",
+                                      fontWeight: "500",
+                                      color: "#374151",
+                                    }}
+                                  >
+                                    {attachment.title ||
+                                      attachment.attachName ||
+                                      `Attachment ${index + 1}`}
+                                  </div>
+                                  {attachment.size && (
+                                    <div
+                                      style={{
+                                        fontSize: "12px",
+                                        color: "#6b7280",
+                                        marginTop: "2px",
+                                      }}
+                                    >
+                                      {attachment.size}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                              <button
+                                onClick={() =>
+                                  handleDownloadAttachment(attachment)
+                                }
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "6px",
+                                  padding: "6px 12px",
+                                  fontSize: "13px",
+                                  backgroundColor: "#3b82f6",
+                                  color: "white",
+                                  border: "none",
+                                  borderRadius: "4px",
+                                  cursor: "pointer",
+                                  transition: "background-color 0.2s",
+                                }}
+                                onMouseOver={(e) =>
+                                  (e.currentTarget.style.backgroundColor =
+                                    "#2563eb")
+                                }
+                                onMouseOut={(e) =>
+                                  (e.currentTarget.style.backgroundColor =
+                                    "#3b82f6")
+                                }
+                              >
+                                View Info
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+
                 <tr>
                   <td>
                     <strong>Status</strong>
@@ -1082,9 +1306,6 @@ const MyAssignment = () => {
 
             <div className="modal-actions">
               <button onClick={handleSave}>Save Changes</button>
-              {/* <button className="delete-btn" onClick={handleDelete}>
-                Delete
-              </button> */}
             </div>
           </div>
         </div>

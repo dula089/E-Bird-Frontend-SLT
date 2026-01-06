@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Eye } from "lucide-react";
+import { Eye, Paperclip, Download } from "lucide-react";
 import "../Components/RequestCSS/MyRequest.css";
 import { useTranslation } from "react-i18next";
 import { getAccessToken } from "../utils/authUtils";
@@ -50,7 +50,6 @@ const MyRequest = () => {
     try {
       const employeeNumbers = new Set();
 
-      // Collect all unique employee numbers from assignTo field
       requests.forEach((req) => {
         if (req.assignTo && /^\d{6}$/.test(req.assignTo.trim())) {
           employeeNumbers.add(req.assignTo.trim());
@@ -62,16 +61,13 @@ const MyRequest = () => {
         Array.from(employeeNumbers)
       );
 
-      // Start with existing name map
       const updatedNameMap = { ...existingNameMap };
 
-      // Fetch names for employee numbers not in the map
       const { getEmployeeHierarchy } = await import("../utils/erpApi");
 
       for (const empNum of employeeNumbers) {
         if (!updatedNameMap[empNum]) {
           try {
-            // Use getEmployeeHierarchy API to fetch individual employee
             const response = await getEmployeeHierarchy(
               empNum,
               "string",
@@ -84,7 +80,6 @@ const MyRequest = () => {
               response.data &&
               response.data.length > 0
             ) {
-              // Find the employee in the response
               const employee = response.data.find(
                 (emp) => emp.employeeNumber === empNum
               );
@@ -97,7 +92,6 @@ const MyRequest = () => {
             }
           } catch (error) {
             console.error(`❌ Error fetching name for ${empNum}:`, error);
-            // Keep the employee number if fetch fails
             updatedNameMap[empNum] = empNum;
           }
         }
@@ -256,13 +250,11 @@ const MyRequest = () => {
 
     const trimmedAssignTo = assignTo.trim();
 
-    // Check if it's a 6-digit employee number
     if (/^\d{6}$/.test(trimmedAssignTo)) {
       const name = employeeMap[trimmedAssignTo];
       if (name && name !== trimmedAssignTo) {
         return `${name} (${trimmedAssignTo})`;
       }
-      // If name not found in map, return just the number
       return trimmedAssignTo;
     }
 
@@ -318,11 +310,121 @@ const MyRequest = () => {
     return filteredRequestsAll.slice(startIndex, startIndex + itemsPerPage);
   }, [filteredRequestsAll, currentPage]);
 
-  const openModal = (request) => setModalRequest({ ...request });
+  const openModal = (request) => {
+    console.log("📋 Opening modal for request:", request);
+    console.log("📎 Attachments data:", request.attachments);
+    console.log("📎 Attachments type:", typeof request.attachments);
+    console.log("📎 Attachments length:", request.attachments?.length);
+    console.log("📎 Full request object:", JSON.stringify(request, null, 2));
+    setModalRequest({ ...request });
+  };
   const closeModal = () => setModalRequest(null);
 
   const handleChange = (e) => {
     setModalRequest({ ...modalRequest, [e.target.name]: e.target.value });
+  };
+
+  const handleDownloadAttachment = async (attachment) => {
+    console.log("📥 Attempting download:", attachment);
+
+    if (!attachment) {
+      Swal.fire({
+        icon: "error",
+        title: "Download Failed",
+        text: "Attachment data not available",
+        confirmButtonColor: "#d33",
+      });
+      return;
+    }
+
+    Swal.fire({
+      title: "Downloading...",
+      text: "Please wait",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
+    try {
+      if (attachment.cout && attachment.cout.trim()) {
+        console.log("✅ Base64 data found, length:", attachment.cout.length);
+
+        const base64Data = attachment.cout.replace(/\s/g, "");
+
+        const byteCharacters = atob(base64Data);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+
+        const fileName =
+          attachment.attachName || attachment.title || "attachment";
+        let mimeType = "application/octet-stream";
+
+        if (fileName.toLowerCase().endsWith(".pdf")) {
+          mimeType = "application/pdf";
+        } else if (fileName.toLowerCase().match(/\.(jpg|jpeg)$/)) {
+          mimeType = "image/jpeg";
+        } else if (fileName.toLowerCase().endsWith(".png")) {
+          mimeType = "image/png";
+        } else if (fileName.toLowerCase().match(/\.(doc|docx)$/)) {
+          mimeType = "application/msword";
+        } else if (fileName.toLowerCase().match(/\.(xls|xlsx)$/)) {
+          mimeType = "application/vnd.ms-excel";
+        }
+
+        const blob = new Blob([byteArray], { type: mimeType });
+
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+
+        Swal.close();
+
+        Swal.fire({
+          icon: "success",
+          title: "Download Complete",
+          text: `${fileName} has been downloaded`,
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      } else {
+        console.log("⚠️ No base64 data available");
+
+        Swal.fire({
+          icon: "warning",
+          title: "Attachment Not Available",
+          html: `
+          <div style="text-align: left; padding: 10px;">
+            <p><strong>File Name:</strong> ${attachment.attachName || "N/A"}</p>
+            <p><strong>Title:</strong> ${attachment.title || "N/A"}</p>
+            <p><strong>Size:</strong> ${attachment.size || "N/A"}</p>
+          </div>
+          <div style="margin-top: 15px; padding: 10px; background-color: #fef3c7; border-radius: 6px; font-size: 13px;">
+            <strong>Note:</strong> The file content is not available for download. The file may need to be re-uploaded.
+          </div>
+        `,
+          confirmButtonColor: "#3b82f6",
+          confirmButtonText: "OK",
+        });
+      }
+    } catch (error) {
+      console.error("❌ Error downloading attachment:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Download Failed",
+        text:
+          error.message || "Failed to download attachment. Please try again.",
+        confirmButtonColor: "#d33",
+      });
+    }
   };
 
   const handleSave = async () => {
@@ -422,7 +524,7 @@ const MyRequest = () => {
 
       setMyRequests(userRequests);
 
-        await fetchEmployeeNamesForRequests(userRequests, employeeMap);
+      await fetchEmployeeNamesForRequests(userRequests, employeeMap);
     } catch (error) {
       console.error("Error deleting request:", error);
       alert(error.message);
@@ -443,26 +545,6 @@ const MyRequest = () => {
       ) : (
         <>
           <button className="my-request-btn">{t("my_requests.button")}</button>
-
-          {/* {currentUser && (
-            <div
-              style={{
-                padding: "10px",
-                fontSize: "14px",
-                color: "#555",
-                backgroundColor: "#f0f0f0",
-                margin: "10px 0",
-                borderRadius: "4px",
-                border: "1px solid #ddd",
-              }}
-            >
-              <strong>Viewing requests from:</strong> {currentUser.name}
-              {currentUser.profile === "erp_employee" && (
-                <span> (Employee #{currentUser.employeeNumber})</span>
-              )}
-              {currentUser.email && <span> - {currentUser.email}</span>}
-            </div>
-          )} */}
 
           <div className="filter-section">
             <input
@@ -498,7 +580,6 @@ const MyRequest = () => {
               <option>{t("completed")}</option>
               <option>{t("rejected")}</option>
             </select>
-            {/* <button className="view-task-button">{t("View_Tasks")}</button> */}
           </div>
 
           <div className="status-legend">
@@ -565,7 +646,19 @@ const MyRequest = () => {
                 <tbody>
                   {paginatedRequests.map((req) => (
                     <tr key={req.id}>
-                      <td>{req.requestId}</td>
+                      <td>
+                        {req.requestId}
+                        {req.attachments && req.attachments.length > 0 && (
+                          <Paperclip
+                            size={14}
+                            style={{
+                              marginLeft: "6px",
+                              color: "#6b7280",
+                              verticalAlign: "middle",
+                            }}
+                          />
+                        )}
+                      </td>
                       <td>{formatDisplayDate(req.receivedDate)}</td>
                       <td>{req.assignedBy}</td>
                       <td>{req.mainCategory}</td>
@@ -660,7 +753,6 @@ const MyRequest = () => {
                       type="text"
                       name="assignedBy"
                       value={modalRequest.assignedBy || ""}
-                      // onChange={handleChange}
                       readOnly
                       style={{ backgroundColor: "#f5f5f5" }}
                     />
@@ -739,6 +831,110 @@ const MyRequest = () => {
                     />
                   </td>
                 </tr>
+
+                {modalRequest.attachments &&
+                  modalRequest.attachments.length > 0 && (
+                    <tr>
+                      <td>
+                        <strong>Attachments</strong>
+                      </td>
+                      <td>
+                        <div
+                          style={{
+                            backgroundColor: "#f9fafb",
+                            padding: "12px",
+                            borderRadius: "6px",
+                            border: "1px solid #e5e7eb",
+                          }}
+                        >
+                          {modalRequest.attachments.map((attachment, index) => (
+                            <div
+                              key={index}
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                                padding: "10px",
+                                marginBottom:
+                                  index < modalRequest.attachments.length - 1
+                                    ? "8px"
+                                    : "0",
+                                backgroundColor: "#ffffff",
+                                borderRadius: "4px",
+                                border: "1px solid #e5e7eb",
+                              }}
+                            >
+                              <div
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "10px",
+                                  flex: 1,
+                                }}
+                              >
+                                <Paperclip
+                                  size={16}
+                                  style={{ color: "#6b7280" }}
+                                />
+                                <div style={{ flex: 1 }}>
+                                  <div
+                                    style={{
+                                      fontSize: "14px",
+                                      fontWeight: "500",
+                                      color: "#374151",
+                                    }}
+                                  >
+                                    {attachment.title ||
+                                      attachment.attachName ||
+                                      `Attachment ${index + 1}`}
+                                  </div>
+                                  {attachment.size && (
+                                    <div
+                                      style={{
+                                        fontSize: "12px",
+                                        color: "#6b7280",
+                                        marginTop: "2px",
+                                      }}
+                                    >
+                                      {attachment.size}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                              <button
+                                onClick={() =>
+                                  handleDownloadAttachment(attachment)
+                                }
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "6px",
+                                  padding: "6px 12px",
+                                  fontSize: "13px",
+                                  backgroundColor: "#3b82f6",
+                                  color: "white",
+                                  border: "none",
+                                  borderRadius: "4px",
+                                  cursor: "pointer",
+                                  transition: "background-color 0.2s",
+                                }}
+                                onMouseOver={(e) =>
+                                  (e.target.style.backgroundColor = "#2563eb")
+                                }
+                                onMouseOut={(e) =>
+                                  (e.target.style.backgroundColor = "#3b82f6")
+                                }
+                              >
+                                <Download size={14} />
+                                Download
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+
                 <tr>
                   <td>
                     <strong>Status</strong>
@@ -766,9 +962,6 @@ const MyRequest = () => {
             </table>
             <div className="modal-actions">
               <button onClick={handleSave}>Save Changes</button>
-              {/* <button className="delete-btn" onClick={handleDelete}>
-                Delete
-              </button> */}
             </div>
           </div>
         </div>
