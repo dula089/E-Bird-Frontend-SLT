@@ -1249,7 +1249,8 @@ const MyAssignment = () => {
                                     "#3b82f6")
                                 }
                               >
-                                View Info
+                                <Download size={14} />
+                                Download
                               </button>
                             </div>
                           ))}
