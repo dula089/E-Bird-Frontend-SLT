@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background: linear-gradient(135deg, #0055a2, #0055a2);
+  background: linear-gradient(135deg, #003b72, #002d57);
   font-family: "Poppins", sans-serif;
 }
 
@@ -72,7 +72,7 @@
 /* Button */
 .login-button {
   width: 100%;
-  background: linear-gradient(90deg, #0078d7, #0055a2);
+  background: linear-gradient(90deg, #0065b7, #00376a);
   color: white;
   border: none;
   padding: 12px;
@@ -156,7 +156,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #0078d4 100%);
+  background: linear-gradient(135deg, hsl(223, 89%, 64%) 0%, #0066b4 100%);
   position: relative;
   overflow: hidden;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -280,6 +280,7 @@
   display: flex;
   justify-content: center;
   margin-bottom: 24px;
+  height: 100px;
 }
 
 .logo-circle {

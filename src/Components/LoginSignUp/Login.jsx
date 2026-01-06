@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import Swal from "sweetalert2";
 import { loginWithEmployeeNumber } from "../../utils/erpApi";
 import "./Login.css";
+import SLT from "../../Assets/E-Bird1.png";
 
 const Login = ({ onLogin }) => {
   const { t, i18n } = useTranslation();
@@ -134,16 +135,9 @@ const Login = ({ onLogin }) => {
 
         {/* Logo/Icon */}
         <div className="login-logo">
-          <div className="logo-circle">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-              <circle cx="12" cy="7" r="4" />
-            </svg>
-          </div>
+          <img src={SLT} alt="Telecom" className="SLT-Telecome" />
         </div>
 
-        {/* Title */}
-        <h1 className="login-title">{t("sltEmployeePortal")}</h1>
         <p className="login-subtitle">{t("enterEmployeeNumberToContinue")}</p>
 
         {/* Form */}
@@ -197,25 +191,6 @@ const Login = ({ onLogin }) => {
             )}
           </button>
         </form>
-
-        {/* Footer */}
-        <div className="login-footer">
-          <svg
-            className="footer-icon"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-          >
-            <circle cx="12" cy="12" r="10" />
-            <path d="M12 16v-4M12 8h.01" />
-          </svg>
-          <p>
-            {t("havingTrouble")}{" "}
-            <a href="#" className="support-link">
-              {t("contactITSupport")}
-            </a>
-          </p>
-        </div>
       </div>
 
       {/* Loading Overlay */}
